@@ -99,6 +99,38 @@ body {
   color: #60a5fa;
 }
 
+.status-select {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.status-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f6;
+}
+
+.status-select.badge-green {
+  background-color: #052e16;
+  color: #4ade80;
+}
+
+.status-select.badge-red {
+  background-color: #450a0a;
+  color: #f87171;
+}
+
+.status-select.badge-yellow {
+  background-color: #422006;
+  color: #fbbf24;
+}
+
 .btn-primary {
   display: inline-flex;
   align-items: center;

@@ -22,6 +22,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Terminal Reports module added (report generation, student performance reports, grade summaries, export)
 - [x] Student attendance register added (class selector, term selector, interactive daily attendance grid, statistics)
 - [x] Student Register menu added as separate item in sidebar (dedicated page with full attendance tracking features)
+- [x] Quick status edit dropdown added to students table (Active, Inactive, Suspended options directly editable in table)
 
 ## Current Structure
 

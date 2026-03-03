@@ -157,6 +157,16 @@ export default function StudentsPage() {
     }
   };
 
+  const handleQuickStatusChange = (studentId: string, newStatus: string) => {
+    const updatedStudents = students.map((s) => {
+      if (s.id === studentId) {
+        return { ...s, status: newStatus };
+      }
+      return s;
+    });
+    setStudents(updatedStudents);
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -248,7 +258,15 @@ export default function StudentsPage() {
                     <span className={`badge ${gpaColor(s.gpa)}`}>{s.gpa}</span>
                   </td>
                   <td>
-                    <span className={`badge ${statusColor(s.status)}`}>{s.status}</span>
+                    <select
+                      value={s.status}
+                      onChange={(e) => handleQuickStatusChange(s.id, e.target.value)}
+                      className={`status-select ${statusColor(s.status)}`}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                      <option value="Suspended">Suspended</option>
+                    </select>
                   </td>
                   <td>
                     <div className="flex items-center gap-2">
