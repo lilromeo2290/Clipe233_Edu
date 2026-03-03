@@ -171,12 +171,14 @@ const classReports: ClassReport[] = [
 export default function TerminalReportsPage() {
   const [selectedSemester, setSelectedSemester] = useState("Spring Semester 2026");
   const [selectedReport, setSelectedReport] = useState<StudentReport | null>(null);
+  const [editableRemarks, setEditableRemarks] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedClassReport, setSelectedClassReport] = useState<ClassReport | null>(null);
   const [showClassModal, setShowClassModal] = useState(false);
   
   const handleViewReport = (report: StudentReport) => {
     setSelectedReport(report);
+    setEditableRemarks(report.remarks);
     setShowModal(true);
   };
   
@@ -262,7 +264,7 @@ export default function TerminalReportsPage() {
             ${report.subjects.map(s => `<tr><td>${s.name}</td><td>${s.code}</td><td>${s.score}%</td><td>${s.grade}</td><td>${s.remarks}</td></tr>`).join('')}
           </tbody>
         </table>
-        <div class="remarks"><h4>Teacher Remarks:</h4><p>${report.remarks}</p></div>
+        <div class="remarks"><h4>Teacher Remarks:</h4><p>${editableRemarks}</p></div>
         <div class="footer"><p>Generated on ${report.generatedAt} | School Management System</p></div>
       </body>
       </html>
@@ -885,7 +887,13 @@ export default function TerminalReportsPage() {
               {/* Remarks */}
               <div className="border-t border-slate-700 pt-4">
                 <h4 className="text-white font-medium mb-2">Teacher Remarks</h4>
-                <p className="text-slate-300 bg-slate-800 p-3 rounded-lg">{selectedReport.remarks}</p>
+                <textarea
+                  value={editableRemarks}
+                  onChange={(e) => setEditableRemarks(e.target.value)}
+                  className="w-full bg-slate-800 text-slate-300 p-3 rounded-lg border border-slate-600 focus:border-emerald-500 focus:outline-none resize-none"
+                  rows={3}
+                  placeholder="Enter teacher remarks..."
+                />
               </div>
 
               {/* Actions */}
