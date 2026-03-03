@@ -1,4 +1,8 @@
 // Types for Terminal Reports
+"use client";
+
+import { useState } from "react";
+
 interface StudentReport {
   id: string;
   studentId: string;
@@ -165,6 +169,8 @@ const classReports: ClassReport[] = [
 ];
 
 export default function TerminalReportsPage() {
+  const [selectedSemester, setSelectedSemester] = useState("Spring Semester 2026");
+  
   const letterColor = (grade: string) => {
     if (grade.startsWith("A")) return "badge-green";
     if (grade.startsWith("B")) return "badge-blue";
@@ -203,12 +209,38 @@ export default function TerminalReportsPage() {
           <p className="text-slate-400 text-sm mt-1">Generate and manage semester terminal reports</p>
         </div>
         <div className="flex items-center gap-3">
-          <select className="search-input">
+          <select 
+            className="search-input"
+            value={selectedSemester}
+            onChange={(e) => setSelectedSemester(e.target.value)}
+          >
             {semesters.map((s) => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
-          <button className="btn-primary">
+          <button 
+            className="btn-primary"
+            onClick={() => {
+              // Export student reports as CSV
+              const headers = ['Student ID', 'Student Name', 'Class', 'Semester', 'Average', 'Grade', 'Rank', 'Attendance', 'Status'];
+              const csvContent = [
+                headers.join(','),
+                ...studentReports.map(r => 
+                  [r.studentId, `"${r.studentName}"`, `"${r.class}"`, `"${r.semester}"`, r.overallAverage.toFixed(1), r.overallGrade, r.rank, r.attendance, r.status].join(',')
+                )
+              ].join('\n');
+              
+              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+              const link = document.createElement('a');
+              const url = URL.createObjectURL(blob);
+              link.setAttribute('href', url);
+              link.setAttribute('download', `terminal_reports_${selectedSemester.replace(/\s+/g, '_')}.csv`);
+              link.style.visibility = 'hidden';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
