@@ -32,6 +32,8 @@ export default function SubjectsPage() {
   ]);
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [subjectToDelete, setSubjectToDelete] = useState<Subject | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
@@ -84,6 +86,18 @@ export default function SubjectsPage() {
       students: 0,
       status: "Active",
     });
+  };
+
+  const handleDeleteSubject = () => {
+    if (!subjectToDelete) return;
+    setSubjects(subjects.filter((s) => s.id !== subjectToDelete.id));
+    setShowDeleteModal(false);
+    setSubjectToDelete(null);
+  };
+
+  const confirmDelete = (subject: Subject) => {
+    setSubjectToDelete(subject);
+    setShowDeleteModal(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -231,6 +245,12 @@ export default function SubjectsPage() {
                       <button className="text-slate-400 hover:text-slate-300 text-sm">
                         View
                       </button>
+                      <button 
+                        onClick={() => confirmDelete(subject)}
+                        className="text-red-400 hover:text-red-300 text-sm"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -357,6 +377,44 @@ export default function SubjectsPage() {
               >
                 Add Subject
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md">
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400">
+                  <path d="M3 6h18" />
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-white mb-2">Delete Subject</h2>
+              <p className="text-slate-400 mb-6">
+                Are you sure you want to delete <span className="text-white font-medium">{subjectToDelete?.name}</span>? This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setSubjectToDelete(null);
+                  }}
+                  className="btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteSubject}
+                  className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         </div>
