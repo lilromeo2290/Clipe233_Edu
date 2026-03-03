@@ -351,7 +351,7 @@ export default function GradesPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {gradeConfig.sort((a, b) => b.minScore - a.minScore).map((grade) => (
+                      {gradeConfig.slice().sort((a, b) => b.minScore - a.minScore).map((grade) => (
                         <tr key={grade.id} className="border-b border-slate-800 hover:bg-slate-800/50">
                           <td className="py-2 px-3">
                             <span className={`badge ${letterColor(grade.letter)}`}>{grade.letter}</span>
