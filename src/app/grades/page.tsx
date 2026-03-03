@@ -136,6 +136,41 @@ export default function GradesPage() {
     setGradeConfig(defaultGradeConfig);
   };
 
+  const handleExportGrades = () => {
+    // Create CSV content
+    const headers = ["Student ID", "Name", "Class", "Math", "English", "Science", "History", "Art", "Average", "Grade", "GPA", "Rank"];
+    const csvRows = [headers.join(",")];
+    
+    grades.forEach((s) => {
+      const row = [
+        s.id,
+        `"${s.name}"`,
+        `"${s.class}"`,
+        s.math,
+        s.english,
+        s.science,
+        s.history,
+        s.art,
+        s.avg.toFixed(1),
+        getLetterGrade(s.avg),
+        getGPA(s.avg).toFixed(1),
+        s.rank
+      ];
+      csvRows.push(row.join(","));
+    });
+    
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `grades_export_${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -160,7 +195,10 @@ export default function GradesPage() {
             <option>Fall Semester 2025</option>
             <option>Spring Semester 2025</option>
           </select>
-          <button className="btn-primary">
+          <button 
+            onClick={handleExportGrades}
+            className="btn-primary"
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
