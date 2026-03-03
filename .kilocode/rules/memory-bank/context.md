@@ -31,6 +31,8 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Settings page added with term/semester configuration (add, edit, delete, set active)
 - [x] Individual Student Reports modal added with print and editable teacher remarks
 - [x] Individual Student Reports grouped by class with collapsible sections
+- [x] Record Payment modal added to Fees page (student info, payment form, quick amount buttons, success state)
+- [x] Record Payment works for both school fees and daily feeding fees tables
 
 ## Current Structure
 
