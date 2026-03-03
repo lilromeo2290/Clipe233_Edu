@@ -15,7 +15,7 @@ interface AttendanceRecord {
   id: string;
   teacherId: string;
   date: string;
-  status: "present" | "absent" | "late" | "permission" | "leave";
+  status: "present" | "absent" | "late" | "leave";
   remarks?: string;
 }
 
@@ -86,8 +86,6 @@ function generateMockAttendance(teachers: Teacher[], days: { date: string; dayNa
         status = "absent";
       } else if (rand < 0.1) {
         status = "late";
-      } else if (rand < 0.13) {
-        status = "permission";
       } else if (rand < 0.18) {
         status = "leave";
       }
@@ -116,8 +114,16 @@ export default function TeachersAttendancePage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
-  const [attendanceData, setAttendanceData] = useState<DayAttendance[]>([]);
+  const [attendanceRecords, setAttendanceRecords] = useState<{ [key: string]: AttendanceRecord["status"] }>({});
   const [loading, setLoading] = useState(false);
+
+  // Handle attendance change
+  const handleAttendanceChange = (teacherId: string, date: string, status: AttendanceRecord["status"]) => {
+    setAttendanceRecords((prev) => ({
+      ...prev,
+      [`${teacherId}-${date}`]: status,
+    }));
+  };
 
   // Filter teachers by department
   const filteredTeachers = selectedDepartment === "All Departments"
@@ -127,12 +133,11 @@ export default function TeachersAttendancePage() {
   // Generate attendance data when filters change
   const days = getDaysInMonth(selectedYear, selectedMonth);
   
-  // Calculate statistics
+  // Calculate statistics based on saved records
   const calculateStats = () => {
     let present = 0;
     let absent = 0;
     let late = 0;
-    let permission = 0;
     let leave = 0;
     let total = 0;
     
@@ -140,24 +145,30 @@ export default function TeachersAttendancePage() {
       if (day.dayName === "Sun" || day.dayName === "Sat") return;
       
       filteredTeachers.forEach((teacher) => {
-        const rand = Math.random();
-        total++;
+        const recordKey = `${teacher.id}-${day.date}`;
+        const savedStatus = attendanceRecords[recordKey];
         
-        if (rand < 0.05) {
-          absent++;
-        } else if (rand < 0.1) {
-          late++;
-        } else if (rand < 0.13) {
-          permission++;
-        } else if (rand < 0.18) {
-          leave++;
+        // Use saved status or generate random
+        let status: string;
+        if (savedStatus) {
+          status = savedStatus;
         } else {
-          present++;
+          const rand = Math.random();
+          if (rand < 0.05) status = "absent";
+          else if (rand < 0.1) status = "late";
+          else if (rand < 0.18) status = "leave";
+          else status = "present";
         }
+        
+        total++;
+        if (status === "present") present++;
+        else if (status === "absent") absent++;
+        else if (status === "late") late++;
+        else if (status === "leave") leave++;
       });
     });
     
-    return { present, absent, late, permission, leave, total };
+    return { present, absent, late, leave, total };
   };
 
   const stats = calculateStats();
@@ -171,8 +182,6 @@ export default function TeachersAttendancePage() {
         return "bg-red-100 text-red-700 border-red-200";
       case "late":
         return "bg-yellow-100 text-yellow-700 border-yellow-200";
-      case "permission":
-        return "bg-purple-100 text-purple-700 border-purple-200";
       case "leave":
         return "bg-blue-100 text-blue-700 border-blue-200";
       case "weekend":
@@ -203,12 +212,6 @@ export default function TeachersAttendancePage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
-      case "permission":
-        return (
-          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-        );
       case "leave":
         return (
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -231,7 +234,6 @@ export default function TeachersAttendancePage() {
     
     if (normalized < 0.05) return "absent";
     if (normalized < 0.1) return "late";
-    if (normalized < 0.13) return "permission";
     if (normalized < 0.18) return "leave";
     return "present";
   };
@@ -362,20 +364,6 @@ export default function TeachersAttendancePage() {
 
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-              <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm text-slate-600">Permission</p>
-              <p className="text-xl font-bold text-slate-900">{stats.permission}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-slate-200 p-4">
-          <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
               <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -451,21 +439,26 @@ export default function TeachersAttendancePage() {
                   </td>
                   {days.map((day) => {
                     const isWeekend = day.dayName === "Sun" || day.dayName === "Sat";
-                    const status = isWeekend ? "weekend" : getRandomStatus(teacher.id, day.date);
+                    const recordKey = `${teacher.id}-${day.date}`;
+                    const savedStatus = attendanceRecords[recordKey];
+                    const defaultStatus = isWeekend ? "weekend" : getRandomStatus(teacher.id, day.date);
+                    const currentStatus = savedStatus || defaultStatus;
                     
                     return (
                       <td key={day.date} className="px-1 py-2 text-center">
                         {isWeekend ? (
                           <span className="text-slate-300">-</span>
                         ) : (
-                          <div
-                            className={`inline-flex items-center justify-center w-7 h-7 rounded text-xs font-medium ${getStatusColor(
-                              status
-                            )}`}
-                            title={`${teacher.name}: ${status}`}
+                          <select
+                            value={currentStatus}
+                            onChange={(e) => handleAttendanceChange(teacher.id, day.date, e.target.value as AttendanceRecord["status"])}
+                            className={`w-10 h-7 text-xs font-bold rounded cursor-pointer bg-white border border-slate-300 focus:outline-none focus:border-blue-500 ${getStatusColor(currentStatus)}`}
                           >
-                            {getStatusIcon(status)}
-                          </div>
+                            <option value="present" className="bg-green-100 text-green-700">P</option>
+                            <option value="absent" className="bg-red-100 text-red-700">A</option>
+                            <option value="late" className="bg-yellow-100 text-yellow-700">L</option>
+                            <option value="leave" className="bg-blue-100 text-blue-700">LV</option>
+                          </select>
                         )}
                       </td>
                     );
@@ -503,14 +496,6 @@ export default function TeachersAttendancePage() {
             </svg>
           </span>
           <span>Late</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="w-4 h-4 rounded bg-purple-100 text-purple-700 flex items-center justify-center">
-            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-          </span>
-          <span>Permission</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-4 h-4 rounded bg-blue-100 text-blue-700 flex items-center justify-center">
