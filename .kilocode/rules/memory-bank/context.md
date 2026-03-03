@@ -21,6 +21,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Daily Feeding Fees module added (dedicated page with payment tracking, meal plans, monthly summary)
 - [x] Terminal Reports module added (report generation, student performance reports, grade summaries, export)
 - [x] Student attendance register added (class selector, term selector, interactive daily attendance grid, statistics)
+- [x] Student Register menu added as separate item in sidebar (dedicated page with full attendance tracking features)
 
 ## Current Structure
 
