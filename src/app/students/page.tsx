@@ -47,6 +47,8 @@ export default function StudentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showBioModal, setShowBioModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [newStudent, setNewStudent] = useState<Partial<Student>>({});
   const [newBio, setNewBio] = useState<Partial<StudentBio>>({});
@@ -95,6 +97,54 @@ export default function StudentsPage() {
   const handleViewBio = (student: Student) => {
     setSelectedStudent(student);
     setShowBioModal(true);
+  };
+
+  const handleViewStudent = (student: Student) => {
+    setSelectedStudent(student);
+    setShowViewModal(true);
+  };
+
+  const handleEditStudent = (student: Student) => {
+    setSelectedStudent(student);
+    setNewStudent({
+      name: student.name,
+      age: student.age,
+      class: student.class,
+      gender: student.gender,
+      phone: student.phone,
+      email: student.email,
+      status: student.status,
+      gpa: student.gpa,
+    });
+    setNewBio(student.bio || {});
+    setShowEditModal(true);
+  };
+
+  const handleUpdateStudent = () => {
+    if (selectedStudent && newStudent.name && newStudent.class) {
+      const updatedStudents = students.map((s) => {
+        if (s.id === selectedStudent.id) {
+          return {
+            ...s,
+            name: newStudent.name || s.name,
+            age: newStudent.age || s.age,
+            class: newStudent.class || s.class,
+            gender: newStudent.gender || s.gender,
+            phone: newStudent.phone || s.phone,
+            email: newStudent.email || s.email,
+            status: newStudent.status || s.status,
+            gpa: newStudent.gpa || s.gpa,
+            bio: newBio.dateOfBirth ? newBio as StudentBio : s.bio,
+          };
+        }
+        return s;
+      });
+      setStudents(updatedStudents);
+      setShowEditModal(false);
+      setSelectedStudent(null);
+      setNewStudent({});
+      setNewBio({});
+    }
   };
 
   const handleDeleteStudent = (id: string) => {
@@ -205,13 +255,13 @@ export default function StudentsPage() {
                           </svg>
                         </button>
                       )}
-                      <button className="text-slate-400 hover:text-blue-400 transition-colors" title="View">
+                      <button onClick={() => handleViewStudent(s)} className="text-slate-400 hover:text-blue-400 transition-colors" title="View">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                           <circle cx="12" cy="12" r="3" />
                         </svg>
                       </button>
-                      <button className="text-slate-400 hover:text-amber-400 transition-colors" title="Edit">
+                      <button onClick={() => handleEditStudent(s)} className="text-slate-400 hover:text-amber-400 transition-colors" title="Edit">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -598,6 +648,366 @@ export default function StudentsPage() {
             <div className="flex items-center justify-end px-6 py-4 border-t border-slate-800">
               <button onClick={() => setShowBioModal(false)} className="btn-secondary">
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Student Modal */}
+      {showViewModal && selectedStudent && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+              <h3 className="text-lg font-semibold text-white">Student Details</h3>
+              <button onClick={() => setShowViewModal(false)} className="text-slate-400 hover:text-white transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              {/* Student Info Header */}
+              <div className="flex items-center gap-4 pb-4 border-b border-slate-800">
+                <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center text-xl font-semibold text-slate-300">
+                  {selectedStudent.name.split(" ").map((n) => n[0]).join("")}
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold text-white">{selectedStudent.name}</h4>
+                  <p className="text-slate-400">{selectedStudent.id} • {selectedStudent.class}</p>
+                  <span className={`badge ${statusColor(selectedStudent.status)} mt-2`}>{selectedStudent.status}</span>
+                </div>
+              </div>
+
+              {/* Basic Information */}
+              <div>
+                <h4 className="text-white font-medium mb-3">Basic Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-slate-500 text-sm">Student ID</p>
+                    <p className="text-white font-mono">{selectedStudent.id}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-sm">Full Name</p>
+                    <p className="text-white">{selectedStudent.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-sm">Age</p>
+                    <p className="text-white">{selectedStudent.age} years old</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-sm">Gender</p>
+                    <p className="text-white">{selectedStudent.gender}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-sm">Class</p>
+                    <p className="text-white">{selectedStudent.class}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-sm">GPA</p>
+                    <span className={`badge ${gpaColor(selectedStudent.gpa)}`}>{selectedStudent.gpa}</span>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-sm">Phone</p>
+                    <p className="text-white">{selectedStudent.phone || "Not provided"}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-sm">Email</p>
+                    <p className="text-white">{selectedStudent.email || "Not provided"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Academic Performance */}
+              <div>
+                <h4 className="text-white font-medium mb-3">Academic Performance</h4>
+                <div className="bg-slate-800/50 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Current GPA</span>
+                    <span className={`text-2xl font-bold ${parseFloat(selectedStudent.gpa) >= 3.5 ? "text-emerald-400" : parseFloat(selectedStudent.gpa) >= 2.5 ? "text-amber-400" : "text-red-400"}`}>
+                      {selectedStudent.gpa}/4.0
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-800">
+              <button onClick={() => setShowViewModal(false)} className="btn-secondary">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Student Modal */}
+      {showEditModal && selectedStudent && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+              <h3 className="text-lg font-semibold text-white">Edit Student</h3>
+              <button onClick={() => setShowEditModal(false)} className="text-slate-400 hover:text-white transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              {/* Basic Information */}
+              <div>
+                <h4 className="text-white font-medium mb-4">Basic Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Full Name *</label>
+                    <input
+                      type="text"
+                      value={newStudent.name || ""}
+                      onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={newStudent.email || ""}
+                      onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Phone</label>
+                    <input
+                      type="tel"
+                      value={newStudent.phone || ""}
+                      onChange={(e) => setNewStudent({ ...newStudent, phone: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Gender</label>
+                    <select
+                      value={newStudent.gender || "Male"}
+                      onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Age</label>
+                    <input
+                      type="number"
+                      value={newStudent.age || ""}
+                      onChange={(e) => setNewStudent({ ...newStudent, age: parseInt(e.target.value) })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Class *</label>
+                    <select
+                      value={newStudent.class || ""}
+                      onChange={(e) => setNewStudent({ ...newStudent, class: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="">Select Class</option>
+                      <option value="Grade 9-A">Grade 9-A</option>
+                      <option value="Grade 9-B">Grade 9-B</option>
+                      <option value="Grade 9-C">Grade 9-C</option>
+                      <option value="Grade 10-A">Grade 10-A</option>
+                      <option value="Grade 10-B">Grade 10-B</option>
+                      <option value="Grade 10-C">Grade 10-C</option>
+                      <option value="Grade 11-A">Grade 11-A</option>
+                      <option value="Grade 11-B">Grade 11-B</option>
+                      <option value="Grade 11-C">Grade 11-C</option>
+                      <option value="Grade 12-A">Grade 12-A</option>
+                      <option value="Grade 12-B">Grade 12-B</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Status</label>
+                    <select
+                      value={newStudent.status || "Active"}
+                      onChange={(e) => setNewStudent({ ...newStudent, status: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                      <option value="Suspended">Suspended</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">GPA</label>
+                    <input
+                      type="text"
+                      value={newStudent.gpa || ""}
+                      onChange={(e) => setNewStudent({ ...newStudent, gpa: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                      placeholder="0.0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Student Bio Data */}
+              <div>
+                <h4 className="text-white font-medium mb-4">Student Bio Data</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Date of Birth</label>
+                    <input
+                      type="date"
+                      value={newBio.dateOfBirth || ""}
+                      onChange={(e) => setNewBio({ ...newBio, dateOfBirth: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Place of Birth</label>
+                    <input
+                      type="text"
+                      value={newBio.placeOfBirth || ""}
+                      onChange={(e) => setNewBio({ ...newBio, placeOfBirth: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Nationality</label>
+                    <input
+                      type="text"
+                      value={newBio.nationality || ""}
+                      onChange={(e) => setNewBio({ ...newBio, nationality: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Religion</label>
+                    <select
+                      value={newBio.religion || ""}
+                      onChange={(e) => setNewBio({ ...newBio, religion: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="">Select Religion</option>
+                      <option value="Christianity">Christianity</option>
+                      <option value="Islam">Islam</option>
+                      <option value="Hinduism">Hinduism</option>
+                      <option value="Buddhism">Buddhism</option>
+                      <option value="Judaism">Judaism</option>
+                      <option value="Other">Other</option>
+                      <option value="None">None</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Blood Type</label>
+                    <select
+                      value={newBio.bloodType || ""}
+                      onChange={(e) => setNewBio({ ...newBio, bloodType: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="">Select Blood Type</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Admission Date</label>
+                    <input
+                      type="date"
+                      value={newBio.admissionDate || ""}
+                      onChange={(e) => setNewBio({ ...newBio, admissionDate: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-slate-400 text-sm mb-1">Address</label>
+                    <input
+                      type="text"
+                      value={newBio.address || ""}
+                      onChange={(e) => setNewBio({ ...newBio, address: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-slate-400 text-sm mb-1">Previous School</label>
+                    <input
+                      type="text"
+                      value={newBio.previousSchool || ""}
+                      onChange={(e) => setNewBio({ ...newBio, previousSchool: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Emergency Contact */}
+              <div>
+                <h4 className="text-white font-medium mb-4">Emergency Contact</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Contact Name</label>
+                    <input
+                      type="text"
+                      value={newBio.emergencyContactName || ""}
+                      onChange={(e) => setNewBio({ ...newBio, emergencyContactName: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Relationship</label>
+                    <select
+                      value={newBio.emergencyContactRelation || ""}
+                      onChange={(e) => setNewBio({ ...newBio, emergencyContactRelation: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="">Select</option>
+                      <option value="Parent">Parent</option>
+                      <option value="Guardian">Guardian</option>
+                      <option value="Sibling">Sibling</option>
+                      <option value="Spouse">Spouse</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Phone Number</label>
+                    <input
+                      type="tel"
+                      value={newBio.emergencyContactPhone || ""}
+                      onChange={(e) => setNewBio({ ...newBio, emergencyContactPhone: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Medical Information */}
+              <div>
+                <h4 className="text-white font-medium mb-4">Medical Information</h4>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-1">Medical Conditions / Allergies</label>
+                  <textarea
+                    value={newBio.medicalConditions || ""}
+                    onChange={(e) => setNewBio({ ...newBio, medicalConditions: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none h-24 resize-none"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-800">
+              <button onClick={() => setShowEditModal(false)} className="btn-secondary">
+                Cancel
+              </button>
+              <button onClick={handleUpdateStudent} className="btn-primary">
+                Save Changes
               </button>
             </div>
           </div>
