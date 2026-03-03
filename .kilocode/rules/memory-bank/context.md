@@ -30,6 +30,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Edit and View buttons fixed in Subjects page
 - [x] Settings page added with term/semester configuration (add, edit, delete, set active)
 - [x] Individual Student Reports modal added with print and editable teacher remarks
+- [x] Individual Student Reports grouped by class with collapsible sections
 
 ## Current Structure
 
@@ -123,3 +124,4 @@ export async function GET() {
 | Today | Terminal Reports module added with report generation, student performance, grade summaries, export |
 | Today | Teachers Attendance module added with permission option (Present, Late, Permission, Leave) |
 | Today | Configurable grading scheme added to Grades page (edit letter grades, GPA, score ranges, descriptions)
+| Today | Individual Student Reports grouped by class with collapsible sections
