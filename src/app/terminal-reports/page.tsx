@@ -211,6 +211,71 @@ export default function TerminalReportsPage() {
     document.body.removeChild(link);
   };
   
+  const handlePrintStudent = (report: StudentReport) => {
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Student Report - ${report.studentName}</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+          .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+          .header h1 { font-size: 24px; margin-bottom: 5px; }
+          .header p { color: #666; font-size: 14px; }
+          .info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+          .info-box { border: 1px solid #ddd; padding: 10px; text-align: center; border-radius: 4px; }
+          .info-box .label { font-size: 12px; color: #666; }
+          .info-box .value { font-size: 20px; font-weight: bold; color: #333; }
+          .student-info { display: flex; justify-content: space-between; margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px; }
+          .student-info div { font-size: 14px; }
+          .student-info strong { color: #333; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
+          th { background: #333; color: white; }
+          tr:nth-child(even) { background: #f9f9f9; }
+          .remarks { padding: 15px; background: #f5f5f5; border-radius: 4px; margin-bottom: 20px; }
+          .remarks h4 { margin-bottom: 10px; font-size: 14px; }
+          .footer { text-align: center; font-size: 12px; color: #666; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 10px; }
+          @media print { body { padding: 0; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>${report.studentName}</h1>
+          <p>Student Report Card - ${report.semester} ${report.academicYear}</p>
+        </div>
+        <div class="student-info">
+          <div><strong>Student ID:</strong> ${report.studentId}</div>
+          <div><strong>Class:</strong> ${report.class}</div>
+          <div><strong>Status:</strong> ${report.status}</div>
+        </div>
+        <div class="info-grid">
+          <div class="info-box"><div class="label">Average</div><div class="value">${report.overallAverage.toFixed(1)}%</div></div>
+          <div class="info-box"><div class="label">Grade</div><div class="value">${report.overallGrade}</div></div>
+          <div class="info-box"><div class="label">Rank</div><div class="value">#${report.rank}</div></div>
+          <div class="info-box"><div class="label">Attendance</div><div class="value">${report.attendance}%</div></div>
+        </div>
+        <table>
+          <thead><tr><th>Subject</th><th>Code</th><th>Score</th><th>Grade</th><th>Remarks</th></tr></thead>
+          <tbody>
+            ${report.subjects.map(s => `<tr><td>${s.name}</td><td>${s.code}</td><td>${s.score}%</td><td>${s.grade}</td><td>${s.remarks}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <div class="remarks"><h4>Teacher Remarks:</h4><p>${report.remarks}</p></div>
+        <div class="footer"><p>Generated on ${report.generatedAt} | School Management System</p></div>
+      </body>
+      </html>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.onload = () => printWindow.print();
+    }
+  };
+  
   const handleExportClass = (classReport: ClassReport) => {
     const headers = ['Class', 'Students', 'Avg Score', 'Pass Rate', 'Highest', 'Lowest', 'Semester', 'Generated'];
     const csvContent = [
@@ -825,6 +890,17 @@ export default function TerminalReportsPage() {
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
+                <button 
+                  onClick={() => handlePrintStudent(selectedReport)}
+                  className="btn-secondary flex-1"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                    <polyline points="6 9 6 2 18 2 18 9" />
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                    <rect x="6" y="14" width="12" height="8" />
+                  </svg>
+                  Print
+                </button>
                 <button 
                   onClick={() => handleExportSingle(selectedReport)}
                   className="btn-primary flex-1"
