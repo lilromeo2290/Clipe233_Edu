@@ -25,6 +25,8 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Quick status edit dropdown added to students table (Active, Inactive, Suspended options directly editable in table)
 - [x] Teachers Attendance module added (dedicated page with attendance register grid, filters by term/department/month/year, statistics)
 - [x] Class details view updated (student table with name, date of admission, status, print functionality)
+- [x] Configurable grading scheme added to Grades page (edit letter grades, GPA, min/max scores, descriptions)
+- [x] Edit and View buttons fixed in Subjects page
 
 ## Current Structure
 
@@ -54,7 +56,7 @@ School Management System is fully built. Features include:
 - Teachers module: table with subjects, classes, ratings
 - Classes module: card grid with schedule, room, avg grade, student list with dates and print
 - Attendance module: daily class view, at-risk students, summary table, per-class per-term attendance register with interactive grid
-- Grades module: distribution chart, top performers, full grade table
+- Grades module: distribution chart, top performers, full grade table, configurable grading scheme (edit letter grades, GPA, score ranges, descriptions)
 - Fees module: payment tracking, fee structure, feeding fees
 - Roles module: role management, permissions, audit log
 - Terminal Reports module: report generation, student performance, grade summaries, export
@@ -115,3 +117,4 @@ export async function GET() {
 | Initial | Template created with base setup |
 | Today | Terminal Reports module added with report generation, student performance, grade summaries, export |
 | Today | Teachers Attendance module added with permission option (Present, Late, Permission, Leave) |
+| Today | Configurable grading scheme added to Grades page (edit letter grades, GPA, score ranges, descriptions)
