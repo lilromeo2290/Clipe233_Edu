@@ -20,6 +20,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Roles & Permissions module added (role cards, permission matrix, user assignments, audit log)
 - [x] Daily Feeding Fees module added (dedicated page with payment tracking, meal plans, monthly summary)
 - [x] Terminal Reports module added (report generation, student performance reports, grade summaries, export)
+- [x] Student attendance register added (class selector, term selector, interactive daily attendance grid, statistics)
 
 ## Current Structure
 
@@ -47,7 +48,7 @@ School Management System is fully built. Features include:
 - Students module: table with GPA, status, search/filter
 - Teachers module: table with subjects, classes, ratings
 - Classes module: card grid with schedule, room, avg grade
-- Attendance module: daily class view, at-risk students, summary table
+- Attendance module: daily class view, at-risk students, summary table, per-class per-term attendance register with interactive grid
 - Grades module: distribution chart, top performers, full grade table
 - Fees module: payment tracking, fee structure, feeding fees
 - Roles module: role management, permissions, audit log
