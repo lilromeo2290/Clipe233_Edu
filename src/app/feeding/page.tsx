@@ -1,0 +1,423 @@
+interface Student {
+  id: number;
+  name: string;
+  class: string;
+  mealPlan: string;
+  amountDue: number;
+  amountPaid: number;
+  balance: number;
+  status: "Paid" | "Partial" | "Unpaid";
+}
+
+interface WeeklySummary {
+  week: string;
+  period: string;
+  totalStudents: number;
+  paid: number;
+  unpaid: number;
+  collectionRate: string;
+  amountCollected: string;
+  inProgress?: boolean;
+}
+
+interface MealPlanDistribution {
+  name: string;
+  students: number;
+  percentage: number;
+  color: string;
+  barColor: string;
+}
+
+interface Transaction {
+  id: string;
+  student: string;
+  class: string;
+  mealPlan: string;
+  amount: number;
+  paymentMethod: string;
+  dateTime: string;
+  status: "Paid" | "Partial";
+}
+
+const students: Student[] = [
+  { id: 1, name: "Kwame Asante", class: "Grade 7A", mealPlan: "Full Day", amountDue: 15.00, amountPaid: 15.00, balance: 0.00, status: "Paid" },
+  { id: 2, name: "Abena Mensah", class: "Grade 8B", mealPlan: "Lunch Only", amountDue: 8.00, amountPaid: 0.00, balance: 8.00, status: "Unpaid" },
+  { id: 3, name: "Kofi Boateng", class: "Grade 6C", mealPlan: "Full Day", amountDue: 15.00, amountPaid: 10.00, balance: 5.00, status: "Partial" },
+  { id: 4, name: "Ama Owusu", class: "Grade 9A", mealPlan: "Breakfast Only", amountDue: 5.00, amountPaid: 5.00, balance: 0.00, status: "Paid" },
+  { id: 5, name: "Yaw Darko", class: "Grade 7B", mealPlan: "Full Day", amountDue: 15.00, amountPaid: 15.00, balance: 0.00, status: "Paid" },
+  { id: 6, name: "Akosua Frimpong", class: "Grade 8A", mealPlan: "Lunch Only", amountDue: 8.00, amountPaid: 0.00, balance: 8.00, status: "Unpaid" },
+  { id: 7, name: "Kwesi Acheampong", class: "Grade 6A", mealPlan: "Full Day", amountDue: 15.00, amountPaid: 15.00, balance: 0.00, status: "Paid" },
+  { id: 8, name: "Efua Asiedu", class: "Grade 9B", mealPlan: "Snack Only", amountDue: 3.00, amountPaid: 3.00, balance: 0.00, status: "Paid" },
+  { id: 9, name: "Nana Adjei", class: "Grade 7C", mealPlan: "Full Day", amountDue: 15.00, amountPaid: 8.00, balance: 7.00, status: "Partial" },
+  { id: 10, name: "Adwoa Amponsah", class: "Grade 8C", mealPlan: "Breakfast Only", amountDue: 5.00, amountPaid: 0.00, balance: 5.00, status: "Unpaid" },
+];
+
+const weeklySummary: WeeklySummary[] = [
+  { week: "Week 1", period: "Feb 3–7", totalStudents: 1247, paid: 1198, unpaid: 49, collectionRate: "96.1%", amountCollected: "GHS 89,850" },
+  { week: "Week 2", period: "Feb 10–14", totalStudents: 1247, paid: 1201, unpaid: 46, collectionRate: "96.3%", amountCollected: "GHS 90,075" },
+  { week: "Week 3", period: "Feb 17–21", totalStudents: 1247, paid: 1189, unpaid: 58, collectionRate: "95.3%", amountCollected: "GHS 89,175" },
+  { week: "Week 4", period: "Feb 24–28", totalStudents: 1247, paid: 1089, unpaid: 158, collectionRate: "87.3%", amountCollected: "GHS 62,350", inProgress: true },
+];
+
+const mealPlans: MealPlanDistribution[] = [
+  { name: "Full Day (All Meals)", students: 687, percentage: 55.1, color: "text-blue-400", barColor: "bg-blue-500" },
+  { name: "Lunch Only", students: 312, percentage: 25.0, color: "text-emerald-400", barColor: "bg-emerald-500" },
+  { name: "Breakfast Only", students: 156, percentage: 12.5, color: "text-amber-400", barColor: "bg-amber-500" },
+  { name: "Snack Only", students: 92, percentage: 7.4, color: "text-red-400", barColor: "bg-red-500" },
+];
+
+const transactions: Transaction[] = [
+  { id: "TXN-2024-001", student: "Kwame Asante", class: "Grade 7A", mealPlan: "Full Day", amount: 15.00, paymentMethod: "Cash", dateTime: "Today 08:15 AM", status: "Paid" },
+  { id: "TXN-2024-002", student: "Yaw Darko", class: "Grade 7B", mealPlan: "Full Day", amount: 15.00, paymentMethod: "Mobile Money", dateTime: "Today 08:22 AM", status: "Paid" },
+  { id: "TXN-2024-003", student: "Efua Asiedu", class: "Grade 9B", mealPlan: "Snack Only", amount: 3.00, paymentMethod: "Cash", dateTime: "Today 08:30 AM", status: "Paid" },
+  { id: "TXN-2024-004", student: "Kwesi Acheampong", class: "Grade 6A", mealPlan: "Full Day", amount: 15.00, paymentMethod: "Card", dateTime: "Today 08:45 AM", status: "Paid" },
+  { id: "TXN-2024-005", student: "Ama Owusu", class: "Grade 9A", mealPlan: "Breakfast Only", amount: 5.00, paymentMethod: "Cash", dateTime: "Today 09:00 AM", status: "Paid" },
+  { id: "TXN-2024-006", student: "Nana Adjei", class: "Grade 7C", mealPlan: "Full Day", amount: 8.00, paymentMethod: "Mobile Money", dateTime: "Today 09:15 AM", status: "Partial" },
+];
+
+function getStatusBadge(status: string): string {
+  if (status === "Paid") return "badge badge-green";
+  if (status === "Partial") return "badge badge-yellow";
+  if (status === "Unpaid") return "badge badge-red";
+  return "badge badge-blue";
+}
+
+function getPaymentMethodColor(method: string): string {
+  if (method === "Cash") return "text-emerald-400";
+  if (method === "Mobile Money") return "text-purple-400";
+  if (method === "Card") return "text-blue-400";
+  return "text-slate-400";
+}
+
+export default function FeedingPage() {
+  return (
+    <div className="p-6 space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Daily Feeding Fees</h1>
+          <p className="text-slate-400 text-sm mt-1">Track and manage daily meal fees for all students</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button className="btn-secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export Report
+          </button>
+          <button className="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Record Payment
+          </button>
+        </div>
+      </div>
+
+      {/* Summary Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-slate-400 text-sm">Total Enrolled</p>
+            <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-white">1,247</p>
+          <p className="text-slate-500 text-xs mt-1">Students in programme</p>
+        </div>
+
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-slate-400 text-sm">Paid Today</p>
+            <span className="badge badge-green text-xs">Today</span>
+          </div>
+          <p className="text-2xl font-bold text-emerald-400">1,089</p>
+          <p className="text-slate-500 text-xs mt-1">Students paid</p>
+        </div>
+
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-slate-400 text-sm">Unpaid Today</p>
+            <span className="badge badge-red text-xs">Pending</span>
+          </div>
+          <p className="text-2xl font-bold text-red-400">158</p>
+          <p className="text-slate-500 text-xs mt-1">Students unpaid</p>
+        </div>
+
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-slate-400 text-sm">Monthly Revenue</p>
+            <span className="badge badge-blue text-xs">Feb 2024</span>
+          </div>
+          <p className="text-2xl font-bold text-blue-400">GHS 62,350</p>
+          <p className="text-slate-500 text-xs mt-1">Current week</p>
+        </div>
+      </div>
+
+      {/* Daily Fee Rate Card */}
+      <div className="page-card px-6 py-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-white font-semibold">Daily Fee Rates</h2>
+            <p className="text-slate-500 text-xs mt-0.5">Current meal plan pricing</p>
+          </div>
+          <button className="btn-secondary text-xs px-3 py-1.5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+            Edit Rates
+          </button>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { meal: "Breakfast", price: "GHS 5.00", icon: "🌅", color: "bg-amber-500/10 border-amber-500/20", textColor: "text-amber-400" },
+            { meal: "Lunch", price: "GHS 8.00", icon: "☀️", color: "bg-blue-500/10 border-blue-500/20", textColor: "text-blue-400" },
+            { meal: "Snack", price: "GHS 3.00", icon: "🍎", color: "bg-emerald-500/10 border-emerald-500/20", textColor: "text-emerald-400" },
+            { meal: "Full Day (All Meals)", price: "GHS 15.00", icon: "🍽️", color: "bg-purple-500/10 border-purple-500/20", textColor: "text-purple-400" },
+          ].map((item) => (
+            <div key={item.meal} className={`rounded-lg border p-4 ${item.color}`}>
+              <div className="text-2xl mb-2">{item.icon}</div>
+              <p className="text-slate-300 text-sm font-medium">{item.meal}</p>
+              <p className={`text-xl font-bold mt-1 ${item.textColor}`}>{item.price}</p>
+              <p className="text-slate-500 text-xs mt-0.5">per student / day</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Today's Payment Status Table */}
+      <div className="page-card">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+          <div>
+            <h2 className="text-white font-semibold">Today&apos;s Feeding Fee Status</h2>
+            <p className="text-slate-500 text-xs mt-0.5">Daily payment tracking for all enrolled students</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Search student..."
+              className="search-input w-48"
+            />
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Class</th>
+                <th>Meal Plan</th>
+                <th>Amount Due</th>
+                <th>Amount Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {students.map((student) => (
+                <tr key={student.id}>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300 flex-shrink-0">
+                        {student.name.split(" ").map((n) => n[0]).join("")}
+                      </div>
+                      <p className="text-white font-medium text-sm">{student.name}</p>
+                    </div>
+                  </td>
+                  <td className="text-slate-400 text-sm">{student.class}</td>
+                  <td>
+                    <span className="text-slate-300 text-sm">{student.mealPlan}</span>
+                  </td>
+                  <td className="text-white font-medium">GHS {student.amountDue.toFixed(2)}</td>
+                  <td className="text-emerald-400">GHS {student.amountPaid.toFixed(2)}</td>
+                  <td className={student.balance > 0 ? "text-red-400 font-medium" : "text-slate-500"}>
+                    GHS {student.balance.toFixed(2)}
+                  </td>
+                  <td>
+                    <span className={getStatusBadge(student.status)}>{student.status}</span>
+                  </td>
+                  <td>
+                    {student.status === "Paid" ? (
+                      <button className="text-xs text-slate-400 hover:text-blue-400 transition-colors border border-slate-700 hover:border-blue-500/50 rounded px-2 py-1">
+                        Receipt
+                      </button>
+                    ) : (
+                      <button className="text-xs text-emerald-400 hover:text-emerald-300 transition-colors border border-emerald-500/30 hover:border-emerald-400/60 rounded px-2 py-1">
+                        Mark Paid
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800">
+          <p className="text-slate-500 text-sm">Showing 10 of 1,247 enrolled students</p>
+          <div className="flex items-center gap-2">
+            <button className="btn-secondary px-3 py-1.5 text-xs">Previous</button>
+            <button className="btn-primary px-3 py-1.5 text-xs">Next</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Monthly Summary + Meal Plan Distribution */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Monthly Collection Summary */}
+        <div className="page-card">
+          <div className="px-6 py-4 border-b border-slate-800">
+            <h2 className="text-white font-semibold">Monthly Collection Summary</h2>
+            <p className="text-slate-500 text-xs mt-0.5">February 2024 weekly breakdown</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>Total</th>
+                  <th>Paid</th>
+                  <th>Unpaid</th>
+                  <th>Rate</th>
+                  <th>Collected</th>
+                </tr>
+              </thead>
+              <tbody>
+                {weeklySummary.map((week) => (
+                  <tr key={week.week} className={week.inProgress ? "bg-blue-500/5" : ""}>
+                    <td>
+                      <div>
+                        <p className="text-white font-medium text-sm">{week.week}</p>
+                        <p className="text-slate-500 text-xs">{week.period}</p>
+                      </div>
+                    </td>
+                    <td className="text-slate-400 text-sm">{week.totalStudents.toLocaleString()}</td>
+                    <td className="text-emerald-400 font-medium">{week.paid.toLocaleString()}</td>
+                    <td className="text-red-400">{week.unpaid}</td>
+                    <td>
+                      <span className={`text-sm font-medium ${
+                        parseFloat(week.collectionRate) >= 95 ? "text-emerald-400" :
+                        parseFloat(week.collectionRate) >= 90 ? "text-amber-400" : "text-red-400"
+                      }`}>
+                        {week.collectionRate}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <span className="text-blue-400 font-medium text-sm">{week.amountCollected}</span>
+                        {week.inProgress && (
+                          <span className="badge badge-blue text-xs ml-1">Live</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Meal Plan Distribution */}
+        <div className="page-card">
+          <div className="px-6 py-4 border-b border-slate-800">
+            <h2 className="text-white font-semibold">Meal Plan Distribution</h2>
+            <p className="text-slate-500 text-xs mt-0.5">Student enrollment by meal plan type</p>
+          </div>
+          <div className="px-6 py-4 space-y-5">
+            {mealPlans.map((plan) => (
+              <div key={plan.name}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <p className="text-slate-300 text-sm font-medium">{plan.name}</p>
+                    <span className="badge badge-blue text-xs">{plan.students.toLocaleString()} students</span>
+                  </div>
+                  <span className={`text-sm font-semibold ${plan.color}`}>{plan.percentage}%</span>
+                </div>
+                <div className="w-full bg-slate-800 rounded-full h-2.5">
+                  <div
+                    className={`${plan.barColor} h-2.5 rounded-full transition-all`}
+                    style={{ width: `${plan.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+
+            <div className="mt-4 pt-4 border-t border-slate-800">
+              <div className="flex items-center justify-between">
+                <p className="text-slate-400 text-sm">Total Enrolled</p>
+                <p className="text-white font-semibold">1,247 students</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Transactions */}
+      <div className="page-card">
+        <div className="px-6 py-4 border-b border-slate-800">
+          <h2 className="text-white font-semibold">Recent Transactions</h2>
+          <p className="text-slate-500 text-xs mt-0.5">Latest feeding fee payments recorded today</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Student</th>
+                <th>Class</th>
+                <th>Meal Plan</th>
+                <th>Amount</th>
+                <th>Payment Method</th>
+                <th>Date / Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((txn) => (
+                <tr key={txn.id}>
+                  <td>
+                    <span className="text-slate-400 text-xs font-mono">{txn.id}</span>
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300 flex-shrink-0">
+                        {txn.student.split(" ").map((n) => n[0]).join("")}
+                      </div>
+                      <p className="text-white font-medium text-sm">{txn.student}</p>
+                    </div>
+                  </td>
+                  <td className="text-slate-400 text-sm">{txn.class}</td>
+                  <td className="text-slate-300 text-sm">{txn.mealPlan}</td>
+                  <td className="text-emerald-400 font-medium">GHS {txn.amount.toFixed(2)}</td>
+                  <td>
+                    <span className={`text-sm font-medium ${getPaymentMethodColor(txn.paymentMethod)}`}>
+                      {txn.paymentMethod}
+                    </span>
+                  </td>
+                  <td className="text-slate-400 text-sm">{txn.dateTime}</td>
+                  <td>
+                    <span className={getStatusBadge(txn.status)}>{txn.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800">
+          <p className="text-slate-500 text-sm">Showing 6 of today&apos;s transactions</p>
+          <button className="btn-secondary text-xs px-3 py-1.5">View All Transactions</button>
+        </div>
+      </div>
+    </div>
+  );
+}
