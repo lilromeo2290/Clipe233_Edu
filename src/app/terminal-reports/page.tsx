@@ -712,6 +712,141 @@ export default function TerminalReportsPage() {
           </div>
         </div>
       )}
+
+      {/* Student Report Modal */}
+      {showModal && selectedReport && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between sticky top-0 bg-slate-900">
+              <h2 className="text-white font-semibold">Student Report Details</h2>
+              <button 
+                onClick={() => setShowModal(false)}
+                className="text-slate-400 hover:text-white"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              {/* Student Info */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                    {selectedReport.studentName.split(" ").map((n) => n[0]).join("")}
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-lg">{selectedReport.studentName}</h3>
+                    <p className="text-slate-400 text-sm">{selectedReport.studentId} • {selectedReport.class}</p>
+                  </div>
+                </div>
+                <span className={`badge ${statusColor(selectedReport.status)}`}>
+                  {selectedReport.status}
+                </span>
+              </div>
+
+              {/* Summary Stats */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="text-center p-3 bg-slate-800 rounded-lg">
+                  <p className="text-2xl font-bold text-blue-400">{selectedReport.overallAverage.toFixed(1)}%</p>
+                  <p className="text-slate-400 text-xs">Average</p>
+                </div>
+                <div className="text-center p-3 bg-slate-800 rounded-lg">
+                  <p className="text-2xl font-bold text-emerald-400">{selectedReport.overallGrade}</p>
+                  <p className="text-slate-400 text-xs">Grade</p>
+                </div>
+                <div className="text-center p-3 bg-slate-800 rounded-lg">
+                  <p className="text-2xl font-bold text-amber-400">#{selectedReport.rank}</p>
+                  <p className="text-slate-400 text-xs">Rank</p>
+                </div>
+                <div className="text-center p-3 bg-slate-800 rounded-lg">
+                  <p className={`text-2xl font-bold ${selectedReport.attendance >= 90 ? "text-emerald-400" : selectedReport.attendance >= 75 ? "text-amber-400" : "text-red-400"}`}>
+                    {selectedReport.attendance}%
+                  </p>
+                  <p className="text-slate-400 text-xs">Attendance</p>
+                </div>
+              </div>
+
+              {/* Semester Info */}
+              <div className="flex items-center justify-between text-sm">
+                <div>
+                  <span className="text-slate-400">Semester: </span>
+                  <span className="text-white">{selectedReport.semester}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Academic Year: </span>
+                  <span className="text-white">{selectedReport.academicYear}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400">Generated: </span>
+                  <span className="text-slate-300">{selectedReport.generatedAt}</span>
+                </div>
+              </div>
+
+              {/* Subject Grades Table */}
+              <div className="border-t border-slate-700 pt-4">
+                <h4 className="text-white font-medium mb-3">Subject Grades</h4>
+                <div className="overflow-x-auto">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Subject</th>
+                        <th>Code</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                        <th>Remarks</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedReport.subjects.map((subject, idx) => (
+                        <tr key={idx}>
+                          <td className="text-white font-medium">{subject.name}</td>
+                          <td className="text-slate-400">{subject.code}</td>
+                          <td className={scoreColor(subject.score)}>{subject.score}%</td>
+                          <td>
+                            <span className={`badge ${letterColor(subject.grade)}`}>
+                              {subject.grade}
+                            </span>
+                          </td>
+                          <td className="text-slate-400">{subject.remarks}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Remarks */}
+              <div className="border-t border-slate-700 pt-4">
+                <h4 className="text-white font-medium mb-2">Teacher Remarks</h4>
+                <p className="text-slate-300 bg-slate-800 p-3 rounded-lg">{selectedReport.remarks}</p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button 
+                  onClick={() => handleExportSingle(selectedReport)}
+                  className="btn-primary flex-1"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Export PDF
+                </button>
+                <button 
+                  onClick={() => setShowModal(false)}
+                  className="btn-secondary flex-1"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
