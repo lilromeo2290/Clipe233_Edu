@@ -23,6 +23,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Student attendance register added (class selector, term selector, interactive daily attendance grid, statistics)
 - [x] Student Register menu added as separate item in sidebar (dedicated page with full attendance tracking features)
 - [x] Quick status edit dropdown added to students table (Active, Inactive, Suspended options directly editable in table)
+- [x] Teachers Attendance module added (dedicated page with attendance register grid, filters by term/department/month/year, statistics)
 
 ## Current Structure
 
@@ -40,6 +41,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 | `src/app/roles/page.tsx` | Roles & permissions management | ✅ Done |
 | `src/app/feeding/page.tsx` | Daily feeding fees tracking and management | ✅ Done |
 | `src/app/terminal-reports/page.tsx` | Terminal reports, grade summaries, export | ✅ Done |
+| `src/app/teachers-attendance/page.tsx` | Teachers attendance register, statistics | ✅ Done |
 | `src/components/layout/Sidebar.tsx` | Sidebar navigation (client component) | ✅ Done |
 | `.kilocode/` | AI context & recipes | ✅ Ready |
 
@@ -55,6 +57,7 @@ School Management System is fully built. Features include:
 - Fees module: payment tracking, fee structure, feeding fees
 - Roles module: role management, permissions, audit log
 - Terminal Reports module: report generation, student performance, grade summaries, export
+- Teachers Attendance module: attendance register grid, filters by term/department/month/year, statistics
 
 ## Quick Start Guide
 
