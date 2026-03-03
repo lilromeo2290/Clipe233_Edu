@@ -63,7 +63,7 @@ export default function GradesPage() {
     return "text-red-400";
   };
 
-  const grades = [
+  const [grades, setGrades] = useState([
     { id: "STU-001", name: "Emma Johnson", class: "Grade 10-A", math: 92, english: 88, science: 95, history: 85, art: 90, avg: 90.0, letter: "A-", rank: 3 },
     { id: "STU-002", name: "Liam Williams", class: "Grade 11-B", math: 78, english: 85, science: 80, history: 82, art: 75, avg: 80.0, letter: "B-", rank: 12 },
     { id: "STU-003", name: "Olivia Brown", class: "Grade 9-C", math: 98, english: 96, science: 97, history: 94, art: 99, avg: 96.8, letter: "A+", rank: 1 },
@@ -74,7 +74,7 @@ export default function GradesPage() {
     { id: "STU-008", name: "Mason Taylor", class: "Grade 12-B", math: 75, english: 80, science: 78, history: 76, art: 82, avg: 78.2, letter: "C+", rank: 18 },
     { id: "STU-009", name: "Isabella Thomas", class: "Grade 10-C", math: 86, english: 84, science: 88, history: 83, art: 87, avg: 85.6, letter: "B", rank: 8 },
     { id: "STU-010", name: "James Jackson", class: "Grade 11-C", math: 58, english: 62, science: 55, history: 60, art: 65, avg: 60.0, letter: "D", rank: 32 },
-  ];
+  ]);
 
   // Calculate grade distribution based on current config
   const gradeDistribution = gradeConfig
@@ -134,6 +134,54 @@ export default function GradesPage() {
 
   const handleResetConfig = () => {
     setGradeConfig(defaultGradeConfig);
+  };
+
+  const handleImportGrades = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const lines = text.split("\n");
+      const headers = lines[0].split(",");
+      
+      // Expected columns: Student ID, Name, Class, Math, English, Science, History, Art
+      const newGrades = lines.slice(1).filter(line => line.trim()).map((line) => {
+        const values = line.split(",");
+        const math = parseInt(values[3]) || 0;
+        const english = parseInt(values[4]) || 0;
+        const science = parseInt(values[5]) || 0;
+        const history = parseInt(values[6]) || 0;
+        const art = parseInt(values[7]) || 0;
+        const avg = (math + english + science + history + art) / 5;
+        
+        return {
+          id: values[0]?.trim() || "STU-" + Date.now(),
+          name: values[1]?.replace(/"/g, "").trim() || "Unknown",
+          class: values[2]?.replace(/"/g, "").trim() || "Unknown",
+          math,
+          english,
+          science,
+          history,
+          art,
+          avg: parseFloat(avg.toFixed(1)),
+          letter: getLetterGrade(avg),
+          rank: 0
+        };
+      });
+      
+      // Recalculate ranks based on average
+      const sortedGrades = [...newGrades].sort((a, b) => b.avg - a.avg);
+      sortedGrades.forEach((grade, idx) => {
+        grade.rank = idx + 1;
+      });
+      
+      setGrades(newGrades);
+      alert(`Successfully imported ${newGrades.length} student grades!`);
+    };
+    reader.readAsText(file);
+    event.target.value = ""; // Reset input
   };
 
   const handleExportGrades = () => {
@@ -206,6 +254,20 @@ export default function GradesPage() {
             </svg>
             Export Grades
           </button>
+          <label className="btn-secondary cursor-pointer flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Import Grades
+            <input 
+              type="file" 
+              accept=".csv" 
+              onChange={handleImportGrades}
+              className="hidden"
+            />
+          </label>
         </div>
       </div>
 
