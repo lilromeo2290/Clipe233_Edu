@@ -26,6 +26,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Teachers Attendance module added (dedicated page with attendance register grid, filters by term/department/month/year, statistics)
 - [x] Class details view updated (student table with name, date of admission, status, print functionality)
 - [x] Configurable grading scheme added to Grades page (edit letter grades, GPA, min/max scores, descriptions)
+- [x] Fixed grade config array mutation issue causing edit/delete to not work
 - [x] Edit and View buttons fixed in Subjects page
 
 ## Current Structure
