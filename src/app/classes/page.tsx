@@ -28,6 +28,7 @@ export default function ClassesPage() {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [newClass, setNewClass] = useState<Partial<ClassItem>>({});
+  const [selectedClass, setSelectedClass] = useState<ClassItem | null>(null);
 
   const gradeColor = (grade: string) => {
     if (grade.startsWith("A")) return "badge-green";
@@ -145,7 +146,7 @@ export default function ClassesPage() {
                 <span className={`badge ${gradeColor(cls.avgGrade)}`}>{cls.avgGrade}</span>
               </div>
               <div className="flex items-center gap-2">
-                <button className="text-slate-400 hover:text-blue-400 transition-colors text-xs btn-secondary py-1 px-2">
+                <button onClick={() => setSelectedClass(cls)} className="text-slate-400 hover:text-blue-400 transition-colors text-xs btn-secondary py-1 px-2">
                   View Details
                 </button>
               </div>
@@ -242,6 +243,73 @@ export default function ClassesPage() {
                 </button>
                 <button onClick={handleAddClass} className="btn-primary">
                   Add Class
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Class Detail Modal */}
+      {selectedClass && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+              <h3 className="text-lg font-semibold text-white">Class Details</h3>
+              <button onClick={() => setSelectedClass(null)} className="text-slate-400 hover:text-white transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              {/* Class Header */}
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">{selectedClass.name}</h2>
+                  <p className="text-slate-400">{selectedClass.subject}</p>
+                </div>
+                <span className={`badge ${selectedClass.status === "Active" ? "badge-green" : "badge-yellow"}`}>
+                  {selectedClass.status}
+                </span>
+              </div>
+
+              {/* Details Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-800 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm">Class ID</p>
+                  <p className="text-white font-medium">{selectedClass.id}</p>
+                </div>
+                <div className="bg-slate-800 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm">Teacher</p>
+                  <p className="text-white font-medium">{selectedClass.teacher}</p>
+                </div>
+                <div className="bg-slate-800 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm">Number of Students</p>
+                  <p className="text-white font-medium">{selectedClass.students}</p>
+                </div>
+                <div className="bg-slate-800 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm">Average Grade</p>
+                  <p className="text-white font-medium">{selectedClass.avgGrade}</p>
+                </div>
+                <div className="bg-slate-800 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm">Room</p>
+                  <p className="text-white font-medium">{selectedClass.room}</p>
+                </div>
+                <div className="bg-slate-800 rounded-lg p-4">
+                  <p className="text-slate-400 text-sm">Schedule</p>
+                  <p className="text-white font-medium">{selectedClass.schedule}</p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                <button onClick={() => setSelectedClass(null)} className="btn-secondary">
+                  Close
+                </button>
+                <button className="btn-primary">
+                  Edit Class
                 </button>
               </div>
             </div>
