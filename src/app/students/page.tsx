@@ -27,6 +27,7 @@ interface Student {
   email: string;
   status: string;
   gpa: string;
+  passportPicture?: string;
   bio?: StudentBio;
 }
 
@@ -85,6 +86,7 @@ export default function StudentsPage() {
         email: newStudent.email || "",
         status: "Active",
         gpa: "0.0",
+        passportPicture: newStudent.passportPicture,
         bio: newBio.dateOfBirth ? newBio as StudentBio : undefined,
       };
       setStudents([...students, student]);
@@ -115,6 +117,7 @@ export default function StudentsPage() {
       email: student.email,
       status: student.status,
       gpa: student.gpa,
+      passportPicture: student.passportPicture,
     });
     setNewBio(student.bio || {});
     setShowEditModal(true);
@@ -134,6 +137,7 @@ export default function StudentsPage() {
             email: newStudent.email || s.email,
             status: newStudent.status || s.status,
             gpa: newStudent.gpa || s.gpa,
+            passportPicture: newStudent.passportPicture || s.passportPicture,
             bio: newBio.dateOfBirth ? newBio as StudentBio : s.bio,
           };
         }
@@ -225,9 +229,13 @@ export default function StudentsPage() {
                 <tr key={s.id}>
                   <td>
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300 flex-shrink-0">
-                        {s.name.split(" ").map((n) => n[0]).join("")}
-                      </div>
+                      {s.passportPicture ? (
+                        <img src={s.passportPicture} alt={s.name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300 flex-shrink-0">
+                          {s.name.split(" ").map((n) => n[0]).join("")}
+                        </div>
+                      )}
                       <span className="text-white font-medium">{s.name}</span>
                     </div>
                   </td>
@@ -310,6 +318,51 @@ export default function StudentsPage() {
               <div>
                 <h4 className="text-white font-medium mb-4">Basic Information</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Passport Picture</label>
+                    <div className="flex items-center gap-4">
+                      <div className="relative">
+                        <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 overflow-hidden border-2 border-dashed border-slate-600">
+                          {newStudent.passportPicture ? (
+                            <img src={newStudent.passportPicture} alt="Passport" className="w-full h-full object-cover" />
+                          ) : (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                              <circle cx="8.5" cy="8.5" r="1.5"/>
+                              <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <label className="btn-secondary cursor-pointer inline-flex items-center gap-2">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                          </svg>
+                          Upload Photo
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setNewStudent({ ...newStudent, passportPicture: reader.result as string });
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                        </label>
+                        <p className="text-slate-500 text-xs mt-1">JPG, PNG up to 2MB</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="md:col-span-2"></div>
                   <div>
                     <label className="block text-slate-400 text-sm mb-1">Full Name *</label>
                     <input
@@ -570,8 +623,12 @@ export default function StudentsPage() {
             <div className="p-6 space-y-6">
               {/* Student Info Header */}
               <div className="flex items-center gap-4 pb-4 border-b border-slate-800">
-                <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center text-xl font-semibold text-slate-300">
-                  {selectedStudent.name.split(" ").map((n) => n[0]).join("")}
+                <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center text-xl font-semibold text-slate-300 overflow-hidden">
+                  {selectedStudent.passportPicture ? (
+                    <img src={selectedStudent.passportPicture} alt={selectedStudent.name} className="w-full h-full object-cover" />
+                  ) : (
+                    selectedStudent.name.split(" ").map((n) => n[0]).join("")
+                  )}
                 </div>
                 <div>
                   <h4 className="text-xl font-semibold text-white">{selectedStudent.name}</h4>
@@ -670,8 +727,12 @@ export default function StudentsPage() {
             <div className="p-6 space-y-6">
               {/* Student Info Header */}
               <div className="flex items-center gap-4 pb-4 border-b border-slate-800">
-                <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center text-xl font-semibold text-slate-300">
-                  {selectedStudent.name.split(" ").map((n) => n[0]).join("")}
+                <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center text-xl font-semibold text-slate-300 overflow-hidden">
+                  {selectedStudent.passportPicture ? (
+                    <img src={selectedStudent.passportPicture} alt={selectedStudent.name} className="w-full h-full object-cover" />
+                  ) : (
+                    selectedStudent.name.split(" ").map((n) => n[0]).join("")
+                  )}
                 </div>
                 <div>
                   <h4 className="text-xl font-semibold text-white">{selectedStudent.name}</h4>
@@ -759,6 +820,51 @@ export default function StudentsPage() {
               <div>
                 <h4 className="text-white font-medium mb-4">Basic Information</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Passport Picture</label>
+                    <div className="flex items-center gap-4">
+                      <div className="relative">
+                        <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 overflow-hidden border-2 border-dashed border-slate-600">
+                          {newStudent.passportPicture ? (
+                            <img src={newStudent.passportPicture} alt="Passport" className="w-full h-full object-cover" />
+                          ) : (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                              <circle cx="8.5" cy="8.5" r="1.5"/>
+                              <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <label className="btn-secondary cursor-pointer inline-flex items-center gap-2">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                          </svg>
+                          Upload Photo
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setNewStudent({ ...newStudent, passportPicture: reader.result as string });
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                        </label>
+                        <p className="text-slate-500 text-xs mt-1">JPG, PNG up to 2MB</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="md:col-span-2"></div>
                   <div>
                     <label className="block text-slate-400 text-sm mb-1">Full Name *</label>
                     <input
