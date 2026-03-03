@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 
+interface Student {
+  id: string;
+  name: string;
+  dateOfAdmission: string;
+  status: string;
+}
+
 interface ClassItem {
   id: string;
   name: string;
@@ -12,18 +19,43 @@ interface ClassItem {
   schedule: string;
   status: string;
   avgGrade: string;
+  studentList?: Student[];
 }
 
 export default function ClassesPage() {
   const [classes, setClasses] = useState<ClassItem[]>([
-    { id: "CLS-001", name: "Grade 12-A", subject: "Advanced Mathematics", teacher: "Dr. Sarah Lee", students: 32, room: "Room 201", schedule: "Mon/Wed/Fri 9:00 AM", status: "Active", avgGrade: "A-" },
-    { id: "CLS-002", name: "Grade 11-B", subject: "English Literature", teacher: "Mr. James Carter", students: 30, room: "Room 105", schedule: "Tue/Thu 10:30 AM", status: "Active", avgGrade: "B+" },
-    { id: "CLS-003", name: "Grade 10-A", subject: "Biology", teacher: "Ms. Rachel Kim", students: 34, room: "Lab 3", schedule: "Mon/Wed 2:00 PM", status: "Active", avgGrade: "B+" },
-    { id: "CLS-004", name: "Grade 9-C", subject: "World History", teacher: "Mr. David Park", students: 28, room: "Room 302", schedule: "Tue/Thu 1:00 PM", status: "Active", avgGrade: "B" },
-    { id: "CLS-005", name: "Grade 12-B", subject: "Chemistry", teacher: "Ms. Linda Chen", students: 29, room: "Lab 1", schedule: "Mon/Wed/Fri 11:00 AM", status: "Active", avgGrade: "B+" },
-    { id: "CLS-006", name: "Grade 11-A", subject: "Physics", teacher: "Mr. Robert Singh", students: 31, room: "Lab 2", schedule: "Tue/Thu 9:00 AM", status: "Active", avgGrade: "A" },
-    { id: "CLS-007", name: "Grade 10-B", subject: "Art & Design", teacher: "Ms. Angela White", students: 25, room: "Art Studio", schedule: "Fri 2:00 PM", status: "On Hold", avgGrade: "A-" },
-    { id: "CLS-008", name: "Grade 9-A", subject: "Physical Education", teacher: "Mr. Kevin Brown", students: 35, room: "Gymnasium", schedule: "Mon/Wed/Fri 3:00 PM", status: "Active", avgGrade: "B" },
+    { id: "CLS-001", name: "Grade 12-A", subject: "Advanced Mathematics", teacher: "Dr. Sarah Lee", students: 32, room: "Room 201", schedule: "Mon/Wed/Fri 9:00 AM", status: "Active", avgGrade: "A-", studentList: [
+      { id: "STU-001", name: "Alice Johnson", dateOfAdmission: "2023-09-01", status: "Active" },
+      { id: "STU-002", name: "Bob Smith", dateOfAdmission: "2023-09-01", status: "Active" },
+      { id: "STU-003", name: "Carol Williams", dateOfAdmission: "2023-09-02", status: "Active" },
+      { id: "STU-004", name: "David Brown", dateOfAdmission: "2023-09-01", status: "Active" },
+      { id: "STU-005", name: "Eva Martinez", dateOfAdmission: "2023-09-03", status: "Active" },
+    ]},
+    { id: "CLS-002", name: "Grade 11-B", subject: "English Literature", teacher: "Mr. James Carter", students: 30, room: "Room 105", schedule: "Tue/Thu 10:30 AM", status: "Active", avgGrade: "B+", studentList: [
+      { id: "STU-006", name: "Frank Davis", dateOfAdmission: "2023-09-01", status: "Active" },
+      { id: "STU-007", name: "Grace Wilson", dateOfAdmission: "2023-09-01", status: "Active" },
+      { id: "STU-008", name: "Henry Taylor", dateOfAdmission: "2023-09-02", status: "Active" },
+    ]},
+    { id: "CLS-003", name: "Grade 10-A", subject: "Biology", teacher: "Ms. Rachel Kim", students: 34, room: "Lab 3", schedule: "Mon/Wed 2:00 PM", status: "Active", avgGrade: "B+", studentList: [
+      { id: "STU-009", name: "Isabel Moore", dateOfAdmission: "2023-09-01", status: "Active" },
+      { id: "STU-010", name: "Jack Anderson", dateOfAdmission: "2023-09-01", status: "Active" },
+    ]},
+    { id: "CLS-004", name: "Grade 9-C", subject: "World History", teacher: "Mr. David Park", students: 28, room: "Room 302", schedule: "Tue/Thu 1:00 PM", status: "Active", avgGrade: "B", studentList: [
+      { id: "STU-011", name: "Katie Thomas", dateOfAdmission: "2024-09-01", status: "Active" },
+      { id: "STU-012", name: "Liam Jackson", dateOfAdmission: "2024-09-01", status: "Active" },
+    ]},
+    { id: "CLS-005", name: "Grade 12-B", subject: "Chemistry", teacher: "Ms. Linda Chen", students: 29, room: "Lab 1", schedule: "Mon/Wed/Fri 11:00 AM", status: "Active", avgGrade: "B+", studentList: [
+      { id: "STU-013", name: "Mia White", dateOfAdmission: "2023-09-01", status: "Active" },
+    ]},
+    { id: "CLS-006", name: "Grade 11-A", subject: "Physics", teacher: "Mr. Robert Singh", students: 31, room: "Lab 2", schedule: "Tue/Thu 9:00 AM", status: "Active", avgGrade: "A", studentList: [
+      { id: "STU-014", name: "Noah Harris", dateOfAdmission: "2023-09-01", status: "Active" },
+    ]},
+    { id: "CLS-007", name: "Grade 10-B", subject: "Art & Design", teacher: "Ms. Angela White", students: 25, room: "Art Studio", schedule: "Fri 2:00 PM", status: "On Hold", avgGrade: "A-", studentList: [
+      { id: "STU-015", name: "Olivia Clark", dateOfAdmission: "2023-09-01", status: "Active" },
+    ]},
+    { id: "CLS-008", name: "Grade 9-A", subject: "Physical Education", teacher: "Mr. Kevin Brown", students: 35, room: "Gymnasium", schedule: "Mon/Wed/Fri 3:00 PM", status: "Active", avgGrade: "B", studentList: [
+      { id: "STU-016", name: "Peter Lewis", dateOfAdmission: "2024-09-01", status: "Active" },
+    ]},
   ]);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -250,12 +282,16 @@ export default function ClassesPage() {
         </div>
       )}
 
-      {/* Class Detail Modal */}
+      {/* Class Detail Modal with Student Table */}
       {selectedClass && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
-              <h3 className="text-lg font-semibold text-white">Class Details</h3>
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 shrink-0">
+              <div>
+                <h3 className="text-lg font-semibold text-white">{selectedClass.name} - Students</h3>
+                <p className="text-slate-400 text-sm">{selectedClass.subject} | {selectedClass.studentList?.length || 0} Students</p>
+              </div>
               <button onClick={() => setSelectedClass(null)} className="text-slate-400 hover:text-white transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -263,55 +299,61 @@ export default function ClassesPage() {
                 </svg>
               </button>
             </div>
-            <div className="p-6 space-y-6">
-              {/* Class Header */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">{selectedClass.name}</h2>
-                  <p className="text-slate-400">{selectedClass.subject}</p>
-                </div>
-                <span className={`badge ${selectedClass.status === "Active" ? "badge-green" : "badge-yellow"}`}>
-                  {selectedClass.status}
-                </span>
-              </div>
 
-              {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-slate-800 rounded-lg p-4">
-                  <p className="text-slate-400 text-sm">Class ID</p>
-                  <p className="text-white font-medium">{selectedClass.id}</p>
-                </div>
-                <div className="bg-slate-800 rounded-lg p-4">
-                  <p className="text-slate-400 text-sm">Teacher</p>
-                  <p className="text-white font-medium">{selectedClass.teacher}</p>
-                </div>
-                <div className="bg-slate-800 rounded-lg p-4">
-                  <p className="text-slate-400 text-sm">Number of Students</p>
-                  <p className="text-white font-medium">{selectedClass.students}</p>
-                </div>
-                <div className="bg-slate-800 rounded-lg p-4">
-                  <p className="text-slate-400 text-sm">Average Grade</p>
-                  <p className="text-white font-medium">{selectedClass.avgGrade}</p>
-                </div>
-                <div className="bg-slate-800 rounded-lg p-4">
-                  <p className="text-slate-400 text-sm">Room</p>
-                  <p className="text-white font-medium">{selectedClass.room}</p>
-                </div>
-                <div className="bg-slate-800 rounded-lg p-4">
-                  <p className="text-slate-400 text-sm">Schedule</p>
-                  <p className="text-white font-medium">{selectedClass.schedule}</p>
-                </div>
+            {/* Class Info Bar */}
+            <div className="px-6 py-3 bg-slate-800/50 border-b border-slate-800 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-6 text-sm">
+                <span className="text-slate-400">Teacher: <span className="text-white">{selectedClass.teacher}</span></span>
+                <span className="text-slate-400">Room: <span className="text-white">{selectedClass.room}</span></span>
+                <span className="text-slate-400">Schedule: <span className="text-white">{selectedClass.schedule}</span></span>
               </div>
+              <button 
+                onClick={() => window.print()}
+                className="btn-secondary flex items-center gap-2"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9" />
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                  <rect x="6" y="14" width="12" height="8" />
+                </svg>
+                Print List
+              </button>
+            </div>
 
-              {/* Actions */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-                <button onClick={() => setSelectedClass(null)} className="btn-secondary">
-                  Close
-                </button>
-                <button className="btn-primary">
-                  Edit Class
-                </button>
-              </div>
+            {/* Student Table */}
+            <div className="flex-1 overflow-auto p-6">
+              <table className="w-full">
+                <thead className="bg-slate-800 sticky top-0">
+                  <tr>
+                    <th className="text-left text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-3">Student ID</th>
+                    <th className="text-left text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-3">Student Name</th>
+                    <th className="text-left text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-3">Date of Admission</th>
+                    <th className="text-left text-slate-400 text-xs font-medium uppercase tracking-wider px-4 py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800">
+                  {selectedClass.studentList?.map((student, index) => (
+                    <tr key={student.id} className="hover:bg-slate-800/30 transition-colors">
+                      <td className="px-4 py-3 text-slate-300 text-sm">{student.id}</td>
+                      <td className="px-4 py-3 text-white font-medium text-sm">{student.name}</td>
+                      <td className="px-4 py-3 text-slate-300 text-sm">{student.dateOfAdmission}</td>
+                      <td className="px-4 py-3">
+                        <span className={`badge ${student.status === "Active" ? "badge-green" : "badge-yellow"}`}>
+                          {student.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-slate-800 flex items-center justify-between shrink-0">
+              <p className="text-slate-400 text-sm">Total Students: {selectedClass.studentList?.length || 0}</p>
+              <button onClick={() => setSelectedClass(null)} className="btn-secondary">
+                Close
+              </button>
             </div>
           </div>
         </div>
