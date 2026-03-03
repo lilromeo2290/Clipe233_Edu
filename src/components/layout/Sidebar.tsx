@@ -39,6 +39,23 @@ const navItems = [
     ),
   },
   {
+    label: "Teachers Attendance",
+    href: "/teachers-attendance",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+        <path d="M8 14h.01" />
+        <path d="M12 14h.01" />
+        <path d="M16 14h.01" />
+        <path d="M8 18h.01" />
+        <path d="M12 18h.01" />
+      </svg>
+    ),
+  },
+  {
     label: "Classes",
     href: "/classes",
     icon: (
@@ -174,7 +191,7 @@ export default function Sidebar() {
         <p className="text-slate-600 text-xs font-semibold uppercase tracking-wider px-3 mt-6 mb-3">
           Academic
         </p>
-        {navItems.slice(1, 8).map((item) => {
+        {navItems.slice(1, 9).map((item) => {
           const isActive =
             item.href === "/"
               ? pathname === "/"
