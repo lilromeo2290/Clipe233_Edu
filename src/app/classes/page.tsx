@@ -1,5 +1,21 @@
+"use client";
+
+import { useState } from "react";
+
+interface ClassItem {
+  id: string;
+  name: string;
+  subject: string;
+  teacher: string;
+  students: number;
+  room: string;
+  schedule: string;
+  status: string;
+  avgGrade: string;
+}
+
 export default function ClassesPage() {
-  const classes = [
+  const [classes, setClasses] = useState<ClassItem[]>([
     { id: "CLS-001", name: "Grade 12-A", subject: "Advanced Mathematics", teacher: "Dr. Sarah Lee", students: 32, room: "Room 201", schedule: "Mon/Wed/Fri 9:00 AM", status: "Active", avgGrade: "A-" },
     { id: "CLS-002", name: "Grade 11-B", subject: "English Literature", teacher: "Mr. James Carter", students: 30, room: "Room 105", schedule: "Tue/Thu 10:30 AM", status: "Active", avgGrade: "B+" },
     { id: "CLS-003", name: "Grade 10-A", subject: "Biology", teacher: "Ms. Rachel Kim", students: 34, room: "Lab 3", schedule: "Mon/Wed 2:00 PM", status: "Active", avgGrade: "B+" },
@@ -8,12 +24,34 @@ export default function ClassesPage() {
     { id: "CLS-006", name: "Grade 11-A", subject: "Physics", teacher: "Mr. Robert Singh", students: 31, room: "Lab 2", schedule: "Tue/Thu 9:00 AM", status: "Active", avgGrade: "A" },
     { id: "CLS-007", name: "Grade 10-B", subject: "Art & Design", teacher: "Ms. Angela White", students: 25, room: "Art Studio", schedule: "Fri 2:00 PM", status: "On Hold", avgGrade: "A-" },
     { id: "CLS-008", name: "Grade 9-A", subject: "Physical Education", teacher: "Mr. Kevin Brown", students: 35, room: "Gymnasium", schedule: "Mon/Wed/Fri 3:00 PM", status: "Active", avgGrade: "B" },
-  ];
+  ]);
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newClass, setNewClass] = useState<Partial<ClassItem>>({});
 
   const gradeColor = (grade: string) => {
     if (grade.startsWith("A")) return "badge-green";
     if (grade.startsWith("B")) return "badge-blue";
     return "badge-yellow";
+  };
+
+  const handleAddClass = () => {
+    if (newClass.name && newClass.subject && newClass.teacher) {
+      const cls: ClassItem = {
+        id: `CLS-${String(classes.length + 1).padStart(3, "0")}`,
+        name: newClass.name,
+        subject: newClass.subject,
+        teacher: newClass.teacher,
+        students: newClass.students || 0,
+        room: newClass.room || "",
+        schedule: newClass.schedule || "",
+        status: "Active",
+        avgGrade: "N/A",
+      };
+      setClasses([...classes, cls]);
+      setShowAddModal(false);
+      setNewClass({});
+    }
   };
 
   return (
@@ -24,7 +62,7 @@ export default function ClassesPage() {
           <h1 className="text-2xl font-bold text-white">Classes</h1>
           <p className="text-slate-400 text-sm mt-1">Manage all classes and courses</p>
         </div>
-        <button className="btn-primary">
+        <button onClick={() => setShowAddModal(true)} className="btn-primary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
@@ -36,10 +74,10 @@ export default function ClassesPage() {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Classes", value: "42", color: "text-emerald-400" },
-          { label: "Active", value: "38", color: "text-blue-400" },
-          { label: "On Hold", value: "3", color: "text-amber-400" },
-          { label: "Avg. Class Size", value: "30.5", color: "text-purple-400" },
+          { label: "Total Classes", value: classes.length.toString(), color: "text-emerald-400" },
+          { label: "Active", value: classes.filter((c) => c.status === "Active").length.toString(), color: "text-blue-400" },
+          { label: "On Hold", value: classes.filter((c) => c.status === "On Hold").length.toString(), color: "text-amber-400" },
+          { label: "Avg. Class Size", value: classes.length > 0 ? (classes.reduce((acc, c) => acc + c.students, 0) / classes.length).toFixed(1) : "0", color: "text-purple-400" },
         ].map((item) => (
           <div key={item.label} className="stat-card text-center">
             <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
@@ -115,6 +153,101 @@ export default function ClassesPage() {
           </div>
         ))}
       </div>
+
+      {/* Add Class Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+              <h3 className="text-lg font-semibold text-white">Add New Class</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              {/* Class Information */}
+              <div>
+                <h4 className="text-white font-medium mb-4">Class Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Class Name *</label>
+                    <input
+                      type="text"
+                      value={newClass.name || ""}
+                      onChange={(e) => setNewClass({ ...newClass, name: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                      placeholder="Grade 12-A"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Subject *</label>
+                    <input
+                      type="text"
+                      value={newClass.subject || ""}
+                      onChange={(e) => setNewClass({ ...newClass, subject: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                      placeholder="Advanced Mathematics"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Teacher *</label>
+                    <input
+                      type="text"
+                      value={newClass.teacher || ""}
+                      onChange={(e) => setNewClass({ ...newClass, teacher: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                      placeholder="Dr. Sarah Lee"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Room</label>
+                    <input
+                      type="text"
+                      value={newClass.room || ""}
+                      onChange={(e) => setNewClass({ ...newClass, room: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                      placeholder="Room 201"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Number of Students</label>
+                    <input
+                      type="number"
+                      value={newClass.students || ""}
+                      onChange={(e) => setNewClass({ ...newClass, students: parseInt(e.target.value) })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                      placeholder="30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-1">Schedule</label>
+                    <input
+                      type="text"
+                      value={newClass.schedule || ""}
+                      onChange={(e) => setNewClass({ ...newClass, schedule: e.target.value })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                      placeholder="Mon/Wed/Fri 9:00 AM"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+                <button onClick={() => setShowAddModal(false)} className="btn-secondary">
+                  Cancel
+                </button>
+                <button onClick={handleAddClass} className="btn-primary">
+                  Add Class
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
