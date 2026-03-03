@@ -172,10 +172,17 @@ export default function TerminalReportsPage() {
   const [selectedSemester, setSelectedSemester] = useState("Spring Semester 2026");
   const [selectedReport, setSelectedReport] = useState<StudentReport | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [selectedClassReport, setSelectedClassReport] = useState<ClassReport | null>(null);
+  const [showClassModal, setShowClassModal] = useState(false);
   
   const handleViewReport = (report: StudentReport) => {
     setSelectedReport(report);
     setShowModal(true);
+  };
+  
+  const handleViewClassReport = (report: ClassReport) => {
+    setSelectedClassReport(report);
+    setShowClassModal(true);
   };
   
   const handleExportSingle = (report: StudentReport) => {
@@ -403,7 +410,10 @@ export default function TerminalReportsPage() {
                   <td className="text-slate-400">{report.generatedAt}</td>
                   <td>
                     <div className="flex items-center gap-2">
-                      <button className="text-blue-400 hover:text-blue-300 text-xs">View</button>
+                      <button 
+                        className="text-blue-400 hover:text-blue-300 text-xs"
+                        onClick={() => handleViewClassReport(report)}
+                      >View</button>
                       <button 
                         className="text-slate-400 hover:text-white text-xs"
                         onClick={() => handleExportClass(report)}
@@ -619,6 +629,89 @@ export default function TerminalReportsPage() {
           ))}
         </div>
       </div>
+
+      {/* Class Report Modal */}
+      {showClassModal && selectedClassReport && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-md">
+            <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+              <h2 className="text-white font-semibold">Class Report Details</h2>
+              <button 
+                onClick={() => setShowClassModal(false)}
+                className="text-slate-400 hover:text-white"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Class</span>
+                <span className="text-white font-medium">{selectedClassReport.className}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Semester</span>
+                <span className="text-white">{selectedClassReport.semester}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Academic Year</span>
+                <span className="text-white">{selectedClassReport.academicYear}</span>
+              </div>
+              <div className="border-t border-slate-700 pt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-slate-800 rounded-lg">
+                    <p className="text-2xl font-bold text-blue-400">{selectedClassReport.studentCount}</p>
+                    <p className="text-slate-400 text-xs">Students</p>
+                  </div>
+                  <div className="text-center p-3 bg-slate-800 rounded-lg">
+                    <p className="text-2xl font-bold text-emerald-400">{selectedClassReport.avgScore.toFixed(1)}%</p>
+                    <p className="text-slate-400 text-xs">Avg Score</p>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-slate-700 pt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Pass Rate</span>
+                  <span className="text-emerald-400 font-semibold">{selectedClassReport.passRate.toFixed(1)}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Highest Score</span>
+                  <span className="text-emerald-400 font-semibold">{selectedClassReport.topScore.toFixed(1)}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Lowest Score</span>
+                  <span className="text-red-400 font-semibold">{selectedClassReport.lowestScore.toFixed(1)}%</span>
+                </div>
+              </div>
+              <div className="border-t border-slate-700 pt-4 flex items-center justify-between">
+                <span className="text-slate-400">Generated</span>
+                <span className="text-slate-300">{selectedClassReport.generatedAt}</span>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button 
+                  onClick={() => handleExportClass(selectedClassReport)}
+                  className="btn-primary flex-1"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  Export CSV
+                </button>
+                <button 
+                  onClick={() => setShowClassModal(false)}
+                  className="btn-secondary flex-1"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
