@@ -54,7 +54,7 @@ interface Transaction {
   status: "Paid" | "Partial";
 }
 
-const students: Student[] = [
+const initialStudents: Student[] = [
   { id: 1, name: "Kwame Asante", class: "Grade 7A", mealPlan: "Full Day", amountDue: 15.00, amountPaid: 15.00, balance: 0.00, status: "Paid" },
   { id: 2, name: "Abena Mensah", class: "Grade 8B", mealPlan: "Lunch Only", amountDue: 8.00, amountPaid: 0.00, balance: 8.00, status: "Unpaid" },
   { id: 3, name: "Kofi Boateng", class: "Grade 6C", mealPlan: "Full Day", amountDue: 15.00, amountPaid: 10.00, balance: 5.00, status: "Partial" },
@@ -90,6 +90,15 @@ const transactions: Transaction[] = [
   { id: "TXN-2024-006", student: "Nana Adjei", class: "Grade 7C", mealPlan: "Full Day", amount: 8.00, paymentMethod: "Mobile Money", dateTime: "Today 09:15 AM", status: "Partial" },
 ];
 
+const classOptions = [
+  "Grade 6A", "Grade 6B", "Grade 6C",
+  "Grade 7A", "Grade 7B", "Grade 7C",
+  "Grade 8A", "Grade 8B", "Grade 8C",
+  "Grade 9A", "Grade 9B", "Grade 9C",
+];
+
+const mealPlanOptions = ["Full Day", "Lunch Only", "Breakfast Only", "Snack Only"];
+
 function getStatusBadge(status: string): string {
   if (status === "Paid") return "badge badge-green";
   if (status === "Partial") return "badge badge-yellow";
@@ -105,9 +114,39 @@ function getPaymentMethodColor(method: string): string {
 }
 
 export default function FeedingPage() {
+  const [students, setStudents] = useState<Student[]>(initialStudents);
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState<FeedingReceipt | null>(null);
   const [receiptNumber, setReceiptNumber] = useState("");
+  const [selectedClass, setSelectedClass] = useState<string>("All");
+  const [showAddStudent, setShowAddStudent] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Add Student Form State
+  const [newStudentName, setNewStudentName] = useState("");
+  const [newStudentClass, setNewStudentClass] = useState("Grade 6A");
+  const [newStudentMealPlan, setNewStudentMealPlan] = useState("Full Day");
+
+  // Get unique classes from students
+  const classes = ["All", ...Array.from(new Set(students.map(s => s.class)))].sort();
+
+  // Filter students by class and search query
+  const filteredStudents = students.filter(student => {
+    const matchesClass = selectedClass === "All" || student.class === selectedClass;
+    const matchesSearch = student.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesClass && matchesSearch;
+  });
+
+  // Get meal plan price
+  const getMealPlanPrice = (plan: string): number => {
+    switch (plan) {
+      case "Full Day": return 15.00;
+      case "Lunch Only": return 8.00;
+      case "Breakfast Only": return 5.00;
+      case "Snack Only": return 3.00;
+      default: return 0;
+    }
+  };
 
   const printFeedingReceipt = (student: Student) => {
     const defaultReceiptId = `FD-${student.id}-${new Date().toISOString().split("T")[0].replace(/-/g, "")}`;
@@ -126,6 +165,27 @@ export default function FeedingPage() {
     setShowReceipt(true);
   };
 
+  const handleAddStudent = () => {
+    if (!newStudentName.trim()) return;
+    
+    const newStudent: Student = {
+      id: students.length + 1,
+      name: newStudentName,
+      class: newStudentClass,
+      mealPlan: newStudentMealPlan,
+      amountDue: getMealPlanPrice(newStudentMealPlan),
+      amountPaid: 0,
+      balance: getMealPlanPrice(newStudentMealPlan),
+      status: "Unpaid",
+    };
+    
+    setStudents([...students, newStudent]);
+    setNewStudentName("");
+    setNewStudentClass("Grade 6A");
+    setNewStudentMealPlan("Full Day");
+    setShowAddStudent(false);
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Page Header */}
@@ -142,6 +202,15 @@ export default function FeedingPage() {
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
             Export Report
+          </button>
+          <button className="btn-secondary" onClick={() => setShowAddStudent(true)}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="8.5" cy="7" r="4" />
+              <line x1="20" y1="8" x2="20" y2="14" />
+              <line x1="23" y1="11" x2="17" y2="11" />
+            </svg>
+            Add Student
           </button>
           <button className="btn-primary">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -167,7 +236,7 @@ export default function FeedingPage() {
               </svg>
             </div>
           </div>
-          <p className="text-2xl font-bold text-white">1,247</p>
+          <p className="text-2xl font-bold text-white">{students.length}</p>
           <p className="text-slate-500 text-xs mt-1">Students in programme</p>
         </div>
 
@@ -176,7 +245,7 @@ export default function FeedingPage() {
             <p className="text-slate-400 text-sm">Paid Today</p>
             <span className="badge badge-green text-xs">Today</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-400">1,089</p>
+          <p className="text-2xl font-bold text-emerald-400">{students.filter(s => s.status === "Paid").length}</p>
           <p className="text-slate-500 text-xs mt-1">Students paid</p>
         </div>
 
@@ -185,7 +254,7 @@ export default function FeedingPage() {
             <p className="text-slate-400 text-sm">Unpaid Today</p>
             <span className="badge badge-red text-xs">Pending</span>
           </div>
-          <p className="text-2xl font-bold text-red-400">158</p>
+          <p className="text-2xl font-bold text-red-400">{students.filter(s => s.status === "Unpaid").length}</p>
           <p className="text-slate-500 text-xs mt-1">Students unpaid</p>
         </div>
 
@@ -194,7 +263,7 @@ export default function FeedingPage() {
             <p className="text-slate-400 text-sm">Monthly Revenue</p>
             <span className="badge badge-blue text-xs">Feb 2024</span>
           </div>
-          <p className="text-2xl font-bold text-blue-400">GHS 62,350</p>
+          <p className="text-2xl font-bold text-blue-400">GHS {students.reduce((sum, s) => sum + s.amountPaid, 0).toFixed(2)}</p>
           <p className="text-slate-500 text-xs mt-1">Current week</p>
         </div>
       </div>
@@ -239,9 +308,20 @@ export default function FeedingPage() {
             <p className="text-slate-500 text-xs mt-0.5">Daily payment tracking for all enrolled students</p>
           </div>
           <div className="flex items-center gap-3">
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
+            >
+              {classes.map((cls) => (
+                <option key={cls} value={cls}>{cls}</option>
+              ))}
+            </select>
             <input
               type="text"
               placeholder="Search student..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input w-48"
             />
           </div>
@@ -261,7 +341,7 @@ export default function FeedingPage() {
               </tr>
             </thead>
             <tbody>
-              {students.map((student) => (
+              {filteredStudents.map((student) => (
                 <tr key={student.id}>
                   <td>
                     <div className="flex items-center gap-2">
@@ -303,7 +383,7 @@ export default function FeedingPage() {
           </table>
         </div>
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800">
-          <p className="text-slate-500 text-sm">Showing 10 of 1,247 enrolled students</p>
+          <p className="text-slate-500 text-sm">Showing {filteredStudents.length} of {students.length} enrolled students</p>
           <div className="flex items-center gap-2">
             <button className="btn-secondary px-3 py-1.5 text-xs">Previous</button>
             <button className="btn-primary px-3 py-1.5 text-xs">Next</button>
@@ -394,7 +474,7 @@ export default function FeedingPage() {
             <div className="mt-4 pt-4 border-t border-slate-800">
               <div className="flex items-center justify-between">
                 <p className="text-slate-400 text-sm">Total Enrolled</p>
-                <p className="text-white font-semibold">1,247 students</p>
+                <p className="text-white font-semibold">{students.length} students</p>
               </div>
             </div>
           </div>
@@ -457,6 +537,104 @@ export default function FeedingPage() {
           <button className="btn-secondary text-xs px-3 py-1.5">View All Transactions</button>
         </div>
       </div>
+
+      {/* Add Student Modal */}
+      {showAddStudent && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-emerald-600 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <line x1="20" y1="8" x2="20" y2="14" />
+                  <line x1="23" y1="11" x2="17" y2="11" />
+                </svg>
+                <h3 className="text-white font-semibold">Add New Student</h3>
+              </div>
+              <button
+                onClick={() => setShowAddStudent(false)}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Form Content */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-slate-400 text-sm mb-2">Student Name</label>
+                <input
+                  type="text"
+                  value={newStudentName}
+                  onChange={(e) => setNewStudentName(e.target.value)}
+                  placeholder="Enter student full name"
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-sm mb-2">Class</label>
+                <select
+                  value={newStudentClass}
+                  onChange={(e) => setNewStudentClass(e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500"
+                >
+                  {classOptions.map((cls) => (
+                    <option key={cls} value={cls}>{cls}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-sm mb-2">Meal Plan</label>
+                <select
+                  value={newStudentMealPlan}
+                  onChange={(e) => setNewStudentMealPlan(e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500"
+                >
+                  {mealPlanOptions.map((plan) => (
+                    <option key={plan} value={plan}>{plan} - GHS {getMealPlanPrice(plan).toFixed(2)}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="bg-slate-800 rounded-lg p-4 mt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Daily Fee Amount:</span>
+                  <span className="text-emerald-400 font-bold text-lg">GHS {getMealPlanPrice(newStudentMealPlan).toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="px-6 py-4 bg-slate-800/50 flex gap-3">
+              <button
+                onClick={handleAddStudent}
+                className="flex-1 btn-primary justify-center"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="8.5" cy="7" r="4" />
+                  <line x1="20" y1="8" x2="20" y2="14" />
+                  <line x1="23" y1="11" x2="17" y2="11" />
+                </svg>
+                Add Student
+              </button>
+              <button
+                onClick={() => setShowAddStudent(false)}
+                className="flex-1 btn-secondary justify-center"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Receipt Modal */}
       {showReceipt && receiptData && (
