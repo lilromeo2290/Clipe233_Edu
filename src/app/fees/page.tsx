@@ -17,6 +17,14 @@ export default function FeesPage() {
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [receiptNumber, setReceiptNumber] = useState("");
+  
+  // Payment modal state - using a union type to support both fee and feeding records
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<typeof feeRecords[0] | typeof feedingRecords[0] | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Bank Transfer");
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const feedingRecords = [
     { id: "FD-001", studentId: "STU-001", name: "Emma Johnson", class: "Grade 10-A", dailyRate: 5, daysEnrolled: 20, daysAttended: 20, amountDue: 100, paid: 100, balance: 0, status: "Paid" },
     { id: "FD-002", studentId: "STU-002", name: "Liam Williams", class: "Grade 11-B", dailyRate: 5, daysEnrolled: 20, daysAttended: 18, amountDue: 100, paid: 50, balance: 50, status: "Partial" },
@@ -105,7 +113,14 @@ export default function FeesPage() {
             </svg>
             Export
           </button>
-          <button className="btn-primary">
+          <button className="btn-primary" onClick={() => {
+            const overdueRecord = feeRecords.find(r => r.balance > 0);
+            if (overdueRecord) {
+              setSelectedRecord(overdueRecord);
+              setPaymentAmount(overdueRecord.balance.toString());
+              setShowPaymentModal(true);
+            }
+          }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
@@ -271,7 +286,15 @@ export default function FeesPage() {
                             <path d="M16 10a4 4 0 0 1-8 0" />
                           </svg>
                         </button>
-                        <button className="text-slate-400 hover:text-emerald-400 transition-colors" title="Record Payment">
+                        <button 
+                          className="text-slate-400 hover:text-emerald-400 transition-colors" 
+                          title="Record Payment"
+                          onClick={() => {
+                            setSelectedRecord(r);
+                            setPaymentAmount(r.balance > 0 ? r.balance.toString() : "");
+                            setShowPaymentModal(true);
+                          }}
+                        >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="12" y1="1" x2="12" y2="23" />
                             <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
@@ -485,7 +508,15 @@ export default function FeesPage() {
                   </td>
                   <td>
                     <div className="flex items-center gap-2">
-                      <button className="text-slate-400 hover:text-emerald-400 transition-colors" title="Record Payment">
+                      <button 
+                        className="text-slate-400 hover:text-emerald-400 transition-colors" 
+                        title="Record Payment"
+                        onClick={() => {
+                          setSelectedRecord(r);
+                          setPaymentAmount(r.balance > 0 ? r.balance.toString() : "");
+                          setShowPaymentModal(true);
+                        }}
+                      >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <line x1="12" y1="1" x2="12" y2="23" />
                           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
@@ -621,6 +652,154 @@ export default function FeesPage() {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Record Payment Modal */}
+      {showPaymentModal && selectedRecord && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-md">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+              <h3 className="text-white font-semibold">Record Payment</h3>
+              <button 
+                onClick={() => {
+                  setShowPaymentModal(false);
+                  setPaymentSuccess(false);
+                }}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Success State */}
+            {paymentSuccess ? (
+              <div className="p-6 text-center">
+                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <h4 className="text-white font-semibold text-lg mb-2">Payment Recorded!</h4>
+                <p className="text-slate-400 text-sm mb-4">
+                  A receipt has been generated for {selectedRecord.name}
+                </p>
+                <button
+                  onClick={() => {
+                    setShowPaymentModal(false);
+                    setPaymentSuccess(false);
+                  }}
+                  className="btn-primary w-full justify-center"
+                >
+                  Done
+                </button>
+              </div>
+            ) : (
+              /* Payment Form */
+              <div className="p-6 space-y-4">
+                {/* Student Info */}
+                <div className="bg-slate-800 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-sm font-semibold text-slate-300">
+                      {selectedRecord.name.split(" ").map(n => n[0]).join("")}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium">{selectedRecord.name}</p>
+                      <p className="text-slate-400 text-xs">{selectedRecord.class} • {selectedRecord.studentId}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-700">
+                    <div>
+                      <p className="text-slate-500 text-xs">Amount Due</p>
+                      <p className="text-white font-medium">${('amount' in selectedRecord ? selectedRecord.amount : selectedRecord.amountDue).toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-xs">Already Paid</p>
+                      <p className="text-emerald-400 font-medium">${selectedRecord.paid.toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500 text-xs">Balance</p>
+                      <p className="text-red-400 font-medium">${selectedRecord.balance.toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payment Amount */}
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Payment Amount</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                    <input
+                      type="number"
+                      value={paymentAmount}
+                      onChange={(e) => setPaymentAmount(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 pl-8 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                      placeholder="Enter amount"
+                    />
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <button 
+                      onClick={() => setPaymentAmount(selectedRecord.balance.toString())}
+                      className="text-xs text-blue-400 hover:text-blue-300"
+                    >
+                      Full Balance
+                    </button>
+                    <button 
+                      onClick={() => setPaymentAmount(Math.ceil(selectedRecord.balance / 2).toString())}
+                      className="text-xs text-slate-500 hover:text-slate-400"
+                    >
+                      Half Balance
+                    </button>
+                  </div>
+                </div>
+
+                {/* Payment Method */}
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Payment Method</label>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Online">Online Payment</option>
+                    <option value="Cheque">Cheque</option>
+                  </select>
+                </div>
+
+                {/* Payment Date */}
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Payment Date</label>
+                  <input
+                    type="date"
+                    value={paymentDate}
+                    onChange={(e) => setPaymentDate(e.target.value)}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  onClick={() => {
+                    // In a real app, this would update the record in the database
+                    setPaymentSuccess(true);
+                  }}
+                  disabled={!paymentAmount || parseFloat(paymentAmount) <= 0}
+                  className="w-full btn-primary justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Record Payment
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
