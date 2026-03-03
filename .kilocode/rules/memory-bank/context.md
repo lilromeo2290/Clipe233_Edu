@@ -17,6 +17,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] School Management System built with 5 modules
 - [x] School Fees Management module added
 - [x] Daily Feeding Fee section added to fees page (per-student tracking + fee structure column)
+- [x] Roles & Permissions module added (role cards, permission matrix, user assignments, audit log)
 
 ## Current Structure
 
@@ -31,6 +32,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 | `src/app/attendance/page.tsx` | Attendance tracking with at-risk view | ✅ Done |
 | `src/app/grades/page.tsx` | Grades, distribution, top performers | ✅ Done |
 | `src/app/fees/page.tsx` | School fees tracking, payments, fee structure | ✅ Done |
+| `src/app/roles/page.tsx` | Roles & permissions management | ✅ Done |
 | `src/components/layout/Sidebar.tsx` | Sidebar navigation (client component) | ✅ Done |
 | `.kilocode/` | AI context & recipes | ✅ Ready |
 
