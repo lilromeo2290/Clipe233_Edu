@@ -16,6 +16,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Recipe system for common features
 - [x] School Management System built with 5 modules
 - [x] School Fees Management module added
+- [x] Daily Feeding Fee section added to fees page (per-student tracking + fee structure column)
 
 ## Current Structure
 

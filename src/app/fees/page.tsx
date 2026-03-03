@@ -1,4 +1,19 @@
 export default function FeesPage() {
+  const feedingRecords = [
+    { id: "FD-001", studentId: "STU-001", name: "Emma Johnson", class: "Grade 10-A", dailyRate: 5, daysEnrolled: 20, daysAttended: 20, amountDue: 100, paid: 100, balance: 0, status: "Paid" },
+    { id: "FD-002", studentId: "STU-002", name: "Liam Williams", class: "Grade 11-B", dailyRate: 5, daysEnrolled: 20, daysAttended: 18, amountDue: 100, paid: 50, balance: 50, status: "Partial" },
+    { id: "FD-003", studentId: "STU-003", name: "Olivia Brown", class: "Grade 9-C", dailyRate: 5, daysEnrolled: 20, daysAttended: 20, amountDue: 100, paid: 100, balance: 0, status: "Paid" },
+    { id: "FD-004", studentId: "STU-004", name: "Noah Davis", class: "Grade 12-A", dailyRate: 5, daysEnrolled: 20, daysAttended: 15, amountDue: 100, paid: 0, balance: 100, status: "Overdue" },
+    { id: "FD-005", studentId: "STU-005", name: "Ava Martinez", class: "Grade 10-B", dailyRate: 5, daysEnrolled: 20, daysAttended: 20, amountDue: 100, paid: 100, balance: 0, status: "Paid" },
+    { id: "FD-006", studentId: "STU-006", name: "Ethan Wilson", class: "Grade 11-A", dailyRate: 5, daysEnrolled: 20, daysAttended: 19, amountDue: 100, paid: 60, balance: 40, status: "Partial" },
+    { id: "FD-007", studentId: "STU-007", name: "Sophia Anderson", class: "Grade 9-A", dailyRate: 5, daysEnrolled: 20, daysAttended: 20, amountDue: 100, paid: 100, balance: 0, status: "Paid" },
+    { id: "FD-008", studentId: "STU-008", name: "Mason Taylor", class: "Grade 12-B", dailyRate: 5, daysEnrolled: 20, daysAttended: 12, amountDue: 100, paid: 0, balance: 100, status: "Overdue" },
+  ];
+
+  const totalFeedingExpected = feedingRecords.reduce((sum, r) => sum + r.amountDue, 0);
+  const totalFeedingCollected = feedingRecords.reduce((sum, r) => sum + r.paid, 0);
+  const totalFeedingOutstanding = feedingRecords.reduce((sum, r) => sum + r.balance, 0);
+
   const feeRecords = [
     { id: "FEE-001", studentId: "STU-001", name: "Emma Johnson", class: "Grade 10-A", term: "Term 1 2024", amount: 1500, paid: 1500, balance: 0, dueDate: "2024-02-15", status: "Paid" },
     { id: "FEE-002", studentId: "STU-002", name: "Liam Williams", class: "Grade 11-B", term: "Term 1 2024", amount: 1500, paid: 750, balance: 750, dueDate: "2024-02-15", status: "Partial" },
@@ -295,18 +310,20 @@ export default function FeesPage() {
                 <th>Activity Fee</th>
                 <th>Lab Fee</th>
                 <th>Library Fee</th>
+                <th>Feeding Fee / Term</th>
                 <th>Total / Term</th>
                 <th>Annual Total</th>
               </tr>
             </thead>
             <tbody>
               {[
-                { grade: "Grade 9", tuition: 800, activity: 150, lab: 100, library: 50 },
-                { grade: "Grade 10", tuition: 900, activity: 150, lab: 150, library: 50 },
-                { grade: "Grade 11", tuition: 1000, activity: 200, lab: 200, library: 50 },
-                { grade: "Grade 12", tuition: 1200, activity: 200, lab: 250, library: 50 },
+                { grade: "Grade 9", tuition: 800, activity: 150, lab: 100, library: 50, feedingDailyRate: 5, schoolDays: 20 },
+                { grade: "Grade 10", tuition: 900, activity: 150, lab: 150, library: 50, feedingDailyRate: 5, schoolDays: 20 },
+                { grade: "Grade 11", tuition: 1000, activity: 200, lab: 200, library: 50, feedingDailyRate: 5, schoolDays: 20 },
+                { grade: "Grade 12", tuition: 1200, activity: 200, lab: 250, library: 50, feedingDailyRate: 5, schoolDays: 20 },
               ].map((row) => {
-                const termTotal = row.tuition + row.activity + row.lab + row.library;
+                const feedingTerm = row.feedingDailyRate * row.schoolDays;
+                const termTotal = row.tuition + row.activity + row.lab + row.library + feedingTerm;
                 return (
                   <tr key={row.grade}>
                     <td className="text-white font-medium">{row.grade}</td>
@@ -314,6 +331,12 @@ export default function FeesPage() {
                     <td>${row.activity.toLocaleString()}</td>
                     <td>${row.lab.toLocaleString()}</td>
                     <td>${row.library.toLocaleString()}</td>
+                    <td>
+                      <div>
+                        <span className="text-orange-400 font-medium">${feedingTerm.toLocaleString()}</span>
+                        <span className="text-slate-500 text-xs ml-1">(${row.feedingDailyRate}/day × {row.schoolDays} days)</span>
+                      </div>
+                    </td>
                     <td className="text-blue-400 font-semibold">${termTotal.toLocaleString()}</td>
                     <td className="text-emerald-400 font-semibold">${(termTotal * 3).toLocaleString()}</td>
                   </tr>
@@ -321,6 +344,131 @@ export default function FeesPage() {
               })}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Daily Feeding Fee Section */}
+      <div className="page-card">
+        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+          <div>
+            <h2 className="text-white font-semibold">Daily Feeding Fee</h2>
+            <p className="text-slate-500 text-xs mt-0.5">Monthly feeding fee tracking — $5.00 per school day</p>
+          </div>
+          <div className="flex items-center gap-4 text-sm">
+            <div className="text-center">
+              <p className="text-white font-semibold">${totalFeedingExpected.toLocaleString()}</p>
+              <p className="text-slate-500 text-xs">Expected</p>
+            </div>
+            <div className="w-px h-8 bg-slate-700" />
+            <div className="text-center">
+              <p className="text-emerald-400 font-semibold">${totalFeedingCollected.toLocaleString()}</p>
+              <p className="text-slate-500 text-xs">Collected</p>
+            </div>
+            <div className="w-px h-8 bg-slate-700" />
+            <div className="text-center">
+              <p className="text-red-400 font-semibold">${totalFeedingOutstanding.toLocaleString()}</p>
+              <p className="text-slate-500 text-xs">Outstanding</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Feeding Fee Info Banner */}
+        <div className="mx-6 mt-4 mb-2 bg-orange-500/10 border border-orange-500/20 rounded-lg px-4 py-3 flex items-start gap-3">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fb923c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 flex-shrink-0">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+            <line x1="6" y1="1" x2="6" y2="4" />
+            <line x1="10" y1="1" x2="10" y2="4" />
+            <line x1="14" y1="1" x2="14" y2="4" />
+          </svg>
+          <div>
+            <p className="text-orange-300 text-sm font-medium">Daily Feeding Programme</p>
+            <p className="text-slate-400 text-xs mt-0.5">Students are charged $5.00 per school day attended. Monthly billing is based on actual attendance. Term total is calculated over 20 school days per month × 3 months.</p>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Class</th>
+                <th>Daily Rate</th>
+                <th>Days Enrolled</th>
+                <th>Days Attended</th>
+                <th>Amount Due</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {feedingRecords.map((r) => (
+                <tr key={r.id}>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300 flex-shrink-0">
+                        {r.name.split(" ").map((n) => n[0]).join("")}
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">{r.name}</p>
+                        <p className="text-slate-500 text-xs font-mono">{r.studentId}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="text-slate-400 text-sm">{r.class}</td>
+                  <td className="text-orange-400 font-medium">${r.dailyRate.toFixed(2)}/day</td>
+                  <td className="text-slate-400">{r.daysEnrolled} days</td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white">{r.daysAttended}</span>
+                      <div className="w-16 bg-slate-800 rounded-full h-1.5">
+                        <div
+                          className="bg-orange-400 h-1.5 rounded-full"
+                          style={{ width: `${(r.daysAttended / r.daysEnrolled) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="text-white font-medium">${r.amountDue.toLocaleString()}</td>
+                  <td className="text-emerald-400">${r.paid.toLocaleString()}</td>
+                  <td className={r.balance > 0 ? "text-red-400 font-medium" : "text-slate-500"}>
+                    ${r.balance.toLocaleString()}
+                  </td>
+                  <td>
+                    <span className={`badge ${
+                      r.status === "Paid" ? "badge-green" :
+                      r.status === "Partial" ? "badge-yellow" :
+                      r.status === "Overdue" ? "badge-red" : "badge-blue"
+                    }`}>{r.status}</span>
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <button className="text-slate-400 hover:text-emerald-400 transition-colors" title="Record Payment">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="12" y1="1" x2="12" y2="23" />
+                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                      </button>
+                      <button className="text-slate-400 hover:text-amber-400 transition-colors" title="Send Reminder">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.69h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800">
+          <p className="text-slate-500 text-sm">Showing 8 of 1,248 enrolled students</p>
+          <div className="flex items-center gap-2">
+            <button className="btn-secondary px-3 py-1.5 text-xs">Previous</button>
+            <button className="btn-primary px-3 py-1.5 text-xs">Next</button>
+          </div>
         </div>
       </div>
     </div>
