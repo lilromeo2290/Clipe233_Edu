@@ -170,6 +170,57 @@ const classReports: ClassReport[] = [
 
 export default function TerminalReportsPage() {
   const [selectedSemester, setSelectedSemester] = useState("Spring Semester 2026");
+  const [selectedReport, setSelectedReport] = useState<StudentReport | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  
+  const handleViewReport = (report: StudentReport) => {
+    setSelectedReport(report);
+    setShowModal(true);
+  };
+  
+  const handleExportSingle = (report: StudentReport) => {
+    const headers = ['Subject', 'Code', 'Score', 'Grade', 'Remarks'];
+    const csvContent = [
+      headers.join(','),
+      ...report.subjects.map(s => 
+        [s.name, s.code, s.score, s.grade, `"${s.remarks}"`].join(',')
+      ),
+      '',
+      `Overall Average,${report.overallAverage.toFixed(1)}%`,
+      `Overall Grade,${report.overallGrade}`,
+      `Rank,${report.rank}`,
+      `Attendance,${report.attendance}%`,
+      `Status,${report.status}`,
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${report.studentName.replace(/\s+/g, '_')}_report_${report.semester.replace(/\s+/g, '_')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  const handleExportClass = (classReport: ClassReport) => {
+    const headers = ['Class', 'Students', 'Avg Score', 'Pass Rate', 'Highest', 'Lowest', 'Semester', 'Generated'];
+    const csvContent = [
+      headers.join(','),
+      [classReport.className, classReport.studentCount, classReport.avgScore.toFixed(1), classReport.passRate.toFixed(1), classReport.topScore.toFixed(1), classReport.lowestScore.toFixed(1), `"${classReport.semester}"`, classReport.generatedAt].join(',')
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${classReport.className.replace(/\s+/g, '_')}_report.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   
   const letterColor = (grade: string) => {
     if (grade.startsWith("A")) return "badge-green";
@@ -353,7 +404,10 @@ export default function TerminalReportsPage() {
                   <td>
                     <div className="flex items-center gap-2">
                       <button className="text-blue-400 hover:text-blue-300 text-xs">View</button>
-                      <button className="text-slate-400 hover:text-white text-xs">Export</button>
+                      <button 
+                        className="text-slate-400 hover:text-white text-xs"
+                        onClick={() => handleExportClass(report)}
+                      >Export</button>
                     </div>
                   </td>
                 </tr>
@@ -440,8 +494,14 @@ export default function TerminalReportsPage() {
                   </td>
                   <td>
                     <div className="flex items-center gap-2">
-                      <button className="text-blue-400 hover:text-blue-300 text-xs">View</button>
-                      <button className="text-slate-400 hover:text-white text-xs">Export</button>
+                      <button 
+                        className="text-blue-400 hover:text-blue-300 text-xs"
+                        onClick={() => handleViewReport(report)}
+                      >View</button>
+                      <button 
+                        className="text-slate-400 hover:text-white text-xs"
+                        onClick={() => handleExportSingle(report)}
+                      >Export</button>
                     </div>
                   </td>
                 </tr>
