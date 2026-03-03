@@ -29,6 +29,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Fixed grade config array mutation issue causing edit/delete to not work
 - [x] Edit and View buttons fixed in Subjects page
 - [x] Settings page added with term/semester configuration (add, edit, delete, set active)
+- [x] Individual Student Reports modal added with print and editable teacher remarks
 
 ## Current Structure
 
