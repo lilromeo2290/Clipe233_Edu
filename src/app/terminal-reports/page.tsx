@@ -175,6 +175,29 @@ export default function TerminalReportsPage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedClassReport, setSelectedClassReport] = useState<ClassReport | null>(null);
   const [showClassModal, setShowClassModal] = useState(false);
+  const [expandedClasses, setExpandedClasses] = useState<Set<string>>(new Set());
+  
+  const toggleClass = (className: string) => {
+    setExpandedClasses(prev => {
+      const next = new Set(prev);
+      if (next.has(className)) {
+        next.delete(className);
+      } else {
+        next.add(className);
+      }
+      return next;
+    });
+  };
+  
+  const groupedReports = studentReports.reduce((acc, report) => {
+    if (!acc[report.class]) {
+      acc[report.class] = [];
+    }
+    acc[report.class].push(report);
+    return acc;
+  }, {} as Record<string, StudentReport[]>);
+  
+  const classNames = Object.keys(groupedReports).sort();
   
   const handleViewReport = (report: StudentReport) => {
     setSelectedReport(report);
@@ -494,7 +517,7 @@ export default function TerminalReportsPage() {
         </div>
       </div>
 
-      {/* Student Reports Table */}
+      {/* Student Reports by Class */}
       <div className="page-card">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
           <h2 className="text-white font-semibold">Individual Student Reports</h2>
@@ -515,79 +538,114 @@ export default function TerminalReportsPage() {
             </select>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Class</th>
-                <th>Semester</th>
-                <th>Average</th>
-                <th>Grade</th>
-                <th>Rank</th>
-                <th>Attendance</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {studentReports.map((report) => (
-                <tr key={report.id}>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300">
-                        {report.studentName.split(" ").map((n) => n[0]).join("")}
-                      </div>
-                      <div>
-                        <p className="text-white font-medium text-sm">{report.studentName}</p>
-                        <p className="text-slate-500 text-xs">{report.studentId}</p>
-                      </div>
+        <div className="divide-y divide-slate-800">
+          {classNames.map((className) => {
+            const reports = groupedReports[className];
+            const isExpanded = expandedClasses.has(className);
+            const avgScore = reports.reduce((sum, r) => sum + r.overallAverage, 0) / reports.length;
+            const publishedCount = reports.filter(r => r.status === "Published").length;
+            
+            return (
+              <div key={className} className="border-b border-slate-800 last:border-b-0">
+                <button
+                  onClick={() => toggleClass(className)}
+                  className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-800/50 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`transform transition-transform ${isExpanded ? 'rotate-90' : ''}`}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
                     </div>
-                  </td>
-                  <td>{report.class}</td>
-                  <td className="text-slate-400 text-sm">{report.semester}</td>
-                  <td className={`font-semibold ${scoreColor(report.overallAverage)}`}>
-                    {report.overallAverage.toFixed(1)}%
-                  </td>
-                  <td>
-                    <span className={`badge ${letterColor(report.overallGrade)}`}>
-                      {report.overallGrade}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${getRankBadge(report.rank)}`}>
-                        {report.rank}
-                      </span>
+                    <div className="text-left">
+                      <h3 className="text-white font-semibold">{className}</h3>
+                      <p className="text-slate-500 text-sm">{reports.length} students • Avg: {avgScore.toFixed(1)}%</p>
                     </div>
-                  </td>
-                  <td className={report.attendance >= 90 ? "text-emerald-400" : report.attendance >= 75 ? "text-amber-400" : "text-red-400"}>
-                    {report.attendance}%
-                  </td>
-                  <td>
-                    <span className={`badge ${statusColor(report.status)}`}>
-                      {report.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <button 
-                        className="text-blue-400 hover:text-blue-300 text-xs"
-                        onClick={() => handleViewReport(report)}
-                      >View</button>
-                      <button 
-                        className="text-slate-400 hover:text-white text-xs"
-                        onClick={() => handleExportSingle(report)}
-                      >Export</button>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-emerald-400 text-sm">{publishedCount} published</span>
+                    <span className="badge badge-blue">{reports.length}</span>
+                  </div>
+                </button>
+                {isExpanded && (
+                  <div className="px-6 pb-4">
+                    <div className="overflow-x-auto ml-6 border-l-2 border-slate-700">
+                      <table className="data-table">
+                        <thead>
+                          <tr>
+                            <th>Student</th>
+                            <th>Semester</th>
+                            <th>Average</th>
+                            <th>Grade</th>
+                            <th>Rank</th>
+                            <th>Attendance</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reports.map((report) => (
+                            <tr key={report.id}>
+                              <td>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center text-xs font-semibold text-slate-300">
+                                    {report.studentName.split(" ").map((n) => n[0]).join("")}
+                                  </div>
+                                  <div>
+                                    <p className="text-white font-medium text-sm">{report.studentName}</p>
+                                    <p className="text-slate-500 text-xs">{report.studentId}</p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="text-slate-400 text-sm">{report.semester}</td>
+                              <td className={`font-semibold ${scoreColor(report.overallAverage)}`}>
+                                {report.overallAverage.toFixed(1)}%
+                              </td>
+                              <td>
+                                <span className={`badge ${letterColor(report.overallGrade)}`}>
+                                  {report.overallGrade}
+                                </span>
+                              </td>
+                              <td>
+                                <div className="flex items-center gap-2">
+                                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${getRankBadge(report.rank)}`}>
+                                    {report.rank}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className={report.attendance >= 90 ? "text-emerald-400" : report.attendance >= 75 ? "text-amber-400" : "text-red-400"}>
+                                {report.attendance}%
+                              </td>
+                              <td>
+                                <span className={`badge ${statusColor(report.status)}`}>
+                                  {report.status}
+                                </span>
+                              </td>
+                              <td>
+                                <div className="flex items-center gap-2">
+                                  <button 
+                                    className="text-blue-400 hover:text-blue-300 text-xs"
+                                    onClick={() => handleViewReport(report)}
+                                  >View</button>
+                                  <button 
+                                    className="text-slate-400 hover:text-white text-xs"
+                                    onClick={() => handleExportSingle(report)}
+                                  >Export</button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800">
-          <p className="text-slate-500 text-sm">Showing 5 of 1,248 reports</p>
+          <p className="text-slate-500 text-sm">Showing {studentReports.length} of 1,248 reports</p>
           <div className="flex items-center gap-2">
             <button className="btn-secondary px-3 py-1.5 text-xs">Previous</button>
             <button className="btn-primary px-3 py-1.5 text-xs">Next</button>
