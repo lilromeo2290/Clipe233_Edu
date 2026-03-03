@@ -28,6 +28,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Configurable grading scheme added to Grades page (edit letter grades, GPA, min/max scores, descriptions)
 - [x] Fixed grade config array mutation issue causing edit/delete to not work
 - [x] Edit and View buttons fixed in Subjects page
+- [x] Settings page added with term/semester configuration (add, edit, delete, set active)
 
 ## Current Structure
 
@@ -46,6 +47,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 | `src/app/feeding/page.tsx` | Daily feeding fees tracking and management | ✅ Done |
 | `src/app/terminal-reports/page.tsx` | Terminal reports, grade summaries, export | ✅ Done |
 | `src/app/teachers-attendance/page.tsx` | Teachers attendance register, statistics | ✅ Done |
+| `src/app/settings/page.tsx` | Settings with term/semester configuration | ✅ Done |
 | `src/components/layout/Sidebar.tsx` | Sidebar navigation (client component) | ✅ Done |
 | `.kilocode/` | AI context & recipes | ✅ Ready |
 
@@ -62,6 +64,7 @@ School Management System is fully built. Features include:
 - Roles module: role management, permissions, audit log
 - Terminal Reports module: report generation, student performance, grade summaries, export
 - Teachers Attendance module: attendance register grid, filters by term/department/month/year, statistics
+- Settings page: term/semester configuration with add, edit, delete, set active
 
 ## Quick Start Guide
 
