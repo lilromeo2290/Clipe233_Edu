@@ -1,4 +1,21 @@
+"use client";
+
+import { useState } from "react";
+
+interface ReceiptData {
+  id: string;
+  studentName: string;
+  studentId: string;
+  class: string;
+  amount: number;
+  paymentMethod: string;
+  date: string;
+  term: string;
+}
+
 export default function FeesPage() {
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const feedingRecords = [
     { id: "FD-001", studentId: "STU-001", name: "Emma Johnson", class: "Grade 10-A", dailyRate: 5, daysEnrolled: 20, daysAttended: 20, amountDue: 100, paid: 100, balance: 0, status: "Paid" },
     { id: "FD-002", studentId: "STU-002", name: "Liam Williams", class: "Grade 11-B", dailyRate: 5, daysEnrolled: 20, daysAttended: 18, amountDue: 100, paid: 50, balance: 50, status: "Partial" },
@@ -46,6 +63,22 @@ export default function FeesPage() {
     if (method === "Bank Transfer") return "text-blue-400";
     if (method === "Cash") return "text-emerald-400";
     return "text-purple-400";
+  };
+
+  const printReceipt = (record: typeof feeRecords[0]) => {
+    const receiptId = `${record.studentId}-${record.term.replace(/\s/g, "")}`;
+    const receipt: ReceiptData = {
+      id: `RCP-${receiptId}`,
+      studentName: record.name,
+      studentId: record.studentId,
+      class: record.class,
+      amount: record.paid,
+      paymentMethod: "Bank Transfer",
+      date: new Date().toISOString().split("T")[0],
+      term: record.term,
+    };
+    setReceiptData(receipt);
+    setShowReceipt(true);
   };
 
   const totalCollected = feeRecords.reduce((sum, r) => sum + r.paid, 0);
@@ -225,10 +258,15 @@ export default function FeesPage() {
                     </td>
                     <td>
                       <div className="flex items-center gap-2">
-                        <button className="text-slate-400 hover:text-blue-400 transition-colors" title="View">
+                        <button
+                          className="text-slate-400 hover:text-blue-400 transition-colors"
+                          title="View Receipt"
+                          onClick={() => printReceipt(r)}
+                        >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <path d="M16 10a4 4 0 0 1-8 0" />
                           </svg>
                         </button>
                         <button className="text-slate-400 hover:text-emerald-400 transition-colors" title="Record Payment">
@@ -471,6 +509,113 @@ export default function FeesPage() {
           </div>
         </div>
       </div>
+
+      {/* Receipt Modal */}
+      {showReceipt && receiptData && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-blue-600 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                <h3 className="text-white font-semibold">Payment Receipt</h3>
+              </div>
+              <button
+                onClick={() => setShowReceipt(false)}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Receipt Content */}
+            <div className="p-6 space-y-4">
+              {/* School Header */}
+              <div className="text-center border-b border-slate-700 pb-4">
+                <h2 className="text-white font-bold text-lg">EduManage School</h2>
+                <p className="text-slate-400 text-xs">123 Education Street, Accra, Ghana</p>
+                <p className="text-slate-400 text-xs">Tel: +233 20 123 4567</p>
+              </div>
+
+              {/* Receipt Details */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Receipt No:</span>
+                  <span className="text-white font-mono text-sm">{receiptData.id}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Date:</span>
+                  <span className="text-white text-sm">{receiptData.date}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Term:</span>
+                  <span className="text-white text-sm">{receiptData.term}</span>
+                </div>
+                <div className="border-t border-slate-700 pt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 text-sm">Student Name:</span>
+                    <span className="text-white text-sm font-medium">{receiptData.studentName}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Student ID:</span>
+                  <span className="text-white text-sm font-mono">{receiptData.studentId}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Class:</span>
+                  <span className="text-white text-sm">{receiptData.class}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Payment Method:</span>
+                  <span className="text-emerald-400 text-sm">{receiptData.paymentMethod}</span>
+                </div>
+              </div>
+
+              {/* Total */}
+              <div className="bg-slate-800 rounded-lg p-4 mt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-semibold">Amount Paid:</span>
+                  <span className="text-emerald-400 font-bold text-xl">${receiptData.amount.toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="text-center pt-4 border-t border-slate-700">
+                <p className="text-slate-500 text-xs">Thank you for your payment!</p>
+                <p className="text-slate-600 text-xs mt-1">Please keep this receipt for your records.</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="px-6 py-4 bg-slate-800/50 flex gap-3">
+              <button
+                onClick={() => window.print()}
+                className="flex-1 btn-primary justify-center"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9" />
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                  <rect x="6" y="14" width="12" height="8" />
+                </svg>
+                Print Receipt
+              </button>
+              <button
+                onClick={() => setShowReceipt(false)}
+                className="flex-1 btn-secondary justify-center"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

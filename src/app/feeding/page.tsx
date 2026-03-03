@@ -1,3 +1,18 @@
+"use client";
+
+import { useState } from "react";
+
+interface FeedingReceipt {
+  id: string;
+  studentName: string;
+  studentId: string;
+  class: string;
+  mealPlan: string;
+  amount: number;
+  paymentMethod: string;
+  date: string;
+}
+
 interface Student {
   id: number;
   name: string;
@@ -90,6 +105,24 @@ function getPaymentMethodColor(method: string): string {
 }
 
 export default function FeedingPage() {
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState<FeedingReceipt | null>(null);
+
+  const printFeedingReceipt = (student: Student) => {
+    const receipt: FeedingReceipt = {
+      id: `FD-${student.id}-${new Date().toISOString().split("T")[0].replace(/-/g, "")}`,
+      studentName: student.name,
+      studentId: `STU-${String(student.id).padStart(3, "0")}`,
+      class: student.class,
+      mealPlan: student.mealPlan,
+      amount: student.amountPaid,
+      paymentMethod: "Cash",
+      date: new Date().toISOString().split("T")[0],
+    };
+    setReceiptData(receipt);
+    setShowReceipt(true);
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Page Header */}
@@ -249,7 +282,10 @@ export default function FeedingPage() {
                   </td>
                   <td>
                     {student.status === "Paid" ? (
-                      <button className="text-xs text-slate-400 hover:text-blue-400 transition-colors border border-slate-700 hover:border-blue-500/50 rounded px-2 py-1">
+                      <button
+                        className="text-xs text-slate-400 hover:text-blue-400 transition-colors border border-slate-700 hover:border-blue-500/50 rounded px-2 py-1"
+                        onClick={() => printFeedingReceipt(student)}
+                      >
                         Receipt
                       </button>
                     ) : (
@@ -418,6 +454,115 @@ export default function FeedingPage() {
           <button className="btn-secondary text-xs px-3 py-1.5">View All Transactions</button>
         </div>
       </div>
+
+      {/* Receipt Modal */}
+      {showReceipt && receiptData && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-emerald-600 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                  <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                  <line x1="6" y1="1" x2="6" y2="4" />
+                  <line x1="10" y1="1" x2="10" y2="4" />
+                  <line x1="14" y1="1" x2="14" y2="4" />
+                </svg>
+                <h3 className="text-white font-semibold">Feeding Fee Receipt</h3>
+              </div>
+              <button
+                onClick={() => setShowReceipt(false)}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Receipt Content */}
+            <div className="p-6 space-y-4">
+              {/* School Header */}
+              <div className="text-center border-b border-slate-700 pb-4">
+                <h2 className="text-white font-bold text-lg">EduManage School</h2>
+                <p className="text-slate-400 text-xs">123 Education Street, Accra, Ghana</p>
+                <p className="text-slate-400 text-xs">Daily Feeding Programme</p>
+              </div>
+
+              {/* Receipt Details */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Receipt No:</span>
+                  <span className="text-white font-mono text-sm">{receiptData.id}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Date:</span>
+                  <span className="text-white text-sm">{receiptData.date}</span>
+                </div>
+                <div className="border-t border-slate-700 pt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400 text-sm">Student Name:</span>
+                    <span className="text-white text-sm font-medium">{receiptData.studentName}</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Student ID:</span>
+                  <span className="text-white text-sm font-mono">{receiptData.studentId}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Class:</span>
+                  <span className="text-white text-sm">{receiptData.class}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Meal Plan:</span>
+                  <span className="text-emerald-400 text-sm">{receiptData.mealPlan}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-400 text-sm">Payment Method:</span>
+                  <span className="text-emerald-400 text-sm">{receiptData.paymentMethod}</span>
+                </div>
+              </div>
+
+              {/* Total */}
+              <div className="bg-slate-800 rounded-lg p-4 mt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-semibold">Amount Paid:</span>
+                  <span className="text-emerald-400 font-bold text-xl">GHS {receiptData.amount.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="text-center pt-4 border-t border-slate-700">
+                <p className="text-slate-500 text-xs">Thank you for your payment!</p>
+                <p className="text-slate-600 text-xs mt-1">Please keep this receipt for your records.</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="px-6 py-4 bg-slate-800/50 flex gap-3">
+              <button
+                onClick={() => window.print()}
+                className="flex-1 btn-primary justify-center"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9" />
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                  <rect x="6" y="14" width="12" height="8" />
+                </svg>
+                Print Receipt
+              </button>
+              <button
+                onClick={() => setShowReceipt(false)}
+                className="flex-1 btn-secondary justify-center"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
