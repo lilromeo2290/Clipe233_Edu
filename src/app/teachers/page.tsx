@@ -377,17 +377,50 @@ export default function TeachersPage() {
           <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-white mb-4">Add New Teacher</h2>
             <div className="space-y-4">
-              {/* Passport Picture URL */}
+              {/* Passport Picture */}
               <div>
-                <label className="text-slate-400 text-sm">Passport Picture URL</label>
-                <input
-                  type="text"
-                  value={newTeacher.passportPicture || ""}
-                  onChange={(e) => setNewTeacher({ ...newTeacher, passportPicture: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white mt-1"
-                  placeholder="https://example.com/photo.jpg"
-                />
-                <p className="text-slate-500 text-xs mt-1">Leave empty for auto-generated avatar</p>
+                <label className="text-slate-400 text-sm">Passport Picture</label>
+                <div className="flex items-center gap-4 mt-1">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 overflow-hidden border-2 border-dashed border-slate-600">
+                      {newTeacher.passportPicture ? (
+                        <img src={newTeacher.passportPicture} alt="Passport" className="w-full h-full object-cover" />
+                      ) : (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                          <circle cx="8.5" cy="8.5" r="1.5"/>
+                          <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <label className="btn-secondary cursor-pointer inline-flex items-center gap-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                      Upload Photo
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setNewTeacher({ ...newTeacher, passportPicture: reader.result as string });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    <p className="text-slate-500 text-xs mt-1">JPG, PNG up to 2MB</p>
+                  </div>
+                </div>
               </div>
 
               {/* Full Name */}
@@ -639,16 +672,50 @@ export default function TeachersPage() {
           <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-white mb-4">Edit Teacher</h2>
             <div className="space-y-4">
-              {/* Passport Picture URL */}
+              {/* Passport Picture */}
               <div>
-                <label className="text-slate-400 text-sm">Passport Picture URL</label>
-                <input
-                  type="text"
-                  value={newTeacher.passportPicture || ""}
-                  onChange={(e) => setNewTeacher({ ...newTeacher, passportPicture: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white mt-1"
-                  placeholder="https://example.com/photo.jpg"
-                />
+                <label className="text-slate-400 text-sm">Passport Picture</label>
+                <div className="flex items-center gap-4 mt-1">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 overflow-hidden border-2 border-dashed border-slate-600">
+                      {newTeacher.passportPicture ? (
+                        <img src={newTeacher.passportPicture} alt="Passport" className="w-full h-full object-cover" />
+                      ) : (
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                          <circle cx="8.5" cy="8.5" r="1.5"/>
+                          <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <label className="btn-secondary cursor-pointer inline-flex items-center gap-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                      Upload Photo
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setNewTeacher({ ...newTeacher, passportPicture: reader.result as string });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    <p className="text-slate-500 text-xs mt-1">JPG, PNG up to 2MB</p>
+                  </div>
+                </div>
               </div>
 
               {/* Full Name */}
