@@ -68,11 +68,11 @@ export default function StudentsPage() {
   const filteredStudents = students.filter((s) =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.email.toLowerCase().includes(searchQuery.toLowerCase())
+    (s.email && s.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const handleAddStudent = () => {
-    if (newStudent.name && newStudent.email && newStudent.class) {
+    if (newStudent.name && newStudent.class) {
       const student: Student = {
         id: `STU-${String(students.length + 1).padStart(3, "0")}`,
         name: newStudent.name,
@@ -80,7 +80,7 @@ export default function StudentsPage() {
         class: newStudent.class,
         gender: newStudent.gender || "Male",
         phone: newStudent.phone || "",
-        email: newStudent.email,
+        email: newStudent.email || "",
         status: "Active",
         gpa: "0.0",
         bio: newBio.dateOfBirth ? newBio as StudentBio : undefined,
@@ -185,7 +185,7 @@ export default function StudentsPage() {
                   <td>{s.class}</td>
                   <td>{s.age}</td>
                   <td>{s.gender}</td>
-                  <td className="text-slate-400">{s.email}</td>
+                  <td className="text-slate-400">{s.email || "-"}</td>
                   <td>
                     <span className={`badge ${gpaColor(s.gpa)}`}>{s.gpa}</span>
                   </td>
@@ -271,7 +271,7 @@ export default function StudentsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-sm mb-1">Email *</label>
+                    <label className="block text-slate-400 text-sm mb-1">Email</label>
                     <input
                       type="email"
                       value={newStudent.email || ""}
