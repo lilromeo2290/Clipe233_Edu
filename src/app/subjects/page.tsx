@@ -33,6 +33,9 @@ export default function SubjectsPage() {
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [subjectToDelete, setSubjectToDelete] = useState<Subject | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -98,6 +101,48 @@ export default function SubjectsPage() {
   const confirmDelete = (subject: Subject) => {
     setSubjectToDelete(subject);
     setShowDeleteModal(true);
+  };
+
+  const handleEdit = (subject: Subject) => {
+    setSelectedSubject(subject);
+    setNewSubject({
+      name: subject.name,
+      code: subject.code,
+      category: subject.category,
+      teacher: subject.teacher,
+      gradeLevel: subject.gradeLevel,
+      credits: subject.credits,
+      description: subject.description,
+      students: subject.students,
+      status: subject.status,
+    });
+    setShowEditModal(true);
+  };
+
+  const handleView = (subject: Subject) => {
+    setSelectedSubject(subject);
+    setShowViewModal(true);
+  };
+
+  const handleUpdateSubject = () => {
+    if (!selectedSubject || !newSubject.name || !newSubject.code || !newSubject.teacher) return;
+    
+    setSubjects(subjects.map((s) => 
+      s.id === selectedSubject.id ? { ...s, ...newSubject } : s
+    ));
+    setShowEditModal(false);
+    setNewSubject({
+      name: "",
+      code: "",
+      category: "Mathematics",
+      teacher: "",
+      gradeLevel: "Grade 9",
+      credits: 3,
+      description: "",
+      students: 0,
+      status: "Active",
+    });
+    setSelectedSubject(null);
   };
 
   const getStatusBadge = (status: string) => {
@@ -239,10 +284,16 @@ export default function SubjectsPage() {
                   </td>
                   <td>
                     <div className="flex gap-2">
-                      <button className="text-blue-400 hover:text-blue-300 text-sm">
+                      <button 
+                        onClick={() => handleEdit(subject)}
+                        className="text-blue-400 hover:text-blue-300 text-sm"
+                      >
                         Edit
                       </button>
-                      <button className="text-slate-400 hover:text-slate-300 text-sm">
+                      <button 
+                        onClick={() => handleView(subject)}
+                        className="text-slate-400 hover:text-slate-300 text-sm"
+                      >
                         View
                       </button>
                       <button 
@@ -415,6 +466,266 @@ export default function SubjectsPage() {
                   Delete
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Subject Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-lg">
+            <div className="flex items-center justify-between p-5 border-b border-slate-800">
+              <h2 className="text-lg font-semibold text-white">Edit Subject</h2>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setSelectedSubject(null);
+                  setNewSubject({
+                    name: "",
+                    code: "",
+                    category: "Mathematics",
+                    teacher: "",
+                    gradeLevel: "Grade 9",
+                    credits: 3,
+                    description: "",
+                    students: 0,
+                    status: "Active",
+                  });
+                }}
+                className="text-slate-400 hover:text-white"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Subject Name *</label>
+                  <input
+                    type="text"
+                    value={newSubject.name}
+                    onChange={(e) => setNewSubject({ ...newSubject, name: e.target.value })}
+                    placeholder="e.g., Advanced Mathematics"
+                    className="search-input w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Subject Code *</label>
+                  <input
+                    type="text"
+                    value={newSubject.code}
+                    onChange={(e) => setNewSubject({ ...newSubject, code: e.target.value })}
+                    placeholder="e.g., MATH-401"
+                    className="search-input w-full"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Category</label>
+                  <select
+                    value={newSubject.category}
+                    onChange={(e) => setNewSubject({ ...newSubject, category: e.target.value })}
+                    className="search-input w-full"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Grade Level</label>
+                  <select
+                    value={newSubject.gradeLevel}
+                    onChange={(e) => setNewSubject({ ...newSubject, gradeLevel: e.target.value })}
+                    className="search-input w-full"
+                  >
+                    {["Grade 9", "Grade 10", "Grade 11", "Grade 12"].map((grade) => (
+                      <option key={grade} value={grade}>{grade}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Teacher *</label>
+                  <input
+                    type="text"
+                    value={newSubject.teacher}
+                    onChange={(e) => setNewSubject({ ...newSubject, teacher: e.target.value })}
+                    placeholder="e.g., Dr. Sarah Lee"
+                    className="search-input w-full"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Credits</label>
+                  <input
+                    type="number"
+                    value={newSubject.credits}
+                    onChange={(e) => setNewSubject({ ...newSubject, credits: parseInt(e.target.value) || 0 })}
+                    min="1"
+                    max="6"
+                    className="search-input w-full"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-sm mb-2">Description</label>
+                <textarea
+                  value={newSubject.description}
+                  onChange={(e) => setNewSubject({ ...newSubject, description: e.target.value })}
+                  placeholder="Brief description of the subject..."
+                  rows={3}
+                  className="search-input w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-sm mb-2">Status</label>
+                <select
+                  value={newSubject.status}
+                  onChange={(e) => setNewSubject({ ...newSubject, status: e.target.value as Subject["status"] })}
+                  className="search-input w-full"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-3 p-5 border-t border-slate-800">
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setSelectedSubject(null);
+                  setNewSubject({
+                    name: "",
+                    code: "",
+                    category: "Mathematics",
+                    teacher: "",
+                    gradeLevel: "Grade 9",
+                    credits: 3,
+                    description: "",
+                    students: 0,
+                    status: "Active",
+                  });
+                }}
+                className="btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateSubject}
+                className="btn-primary flex-1"
+              >
+                Update Subject
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Subject Modal */}
+      {showViewModal && selectedSubject && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-lg">
+            <div className="flex items-center justify-between p-5 border-b border-slate-800">
+              <h2 className="text-lg font-semibold text-white">Subject Details</h2>
+              <button
+                onClick={() => {
+                  setShowViewModal(false);
+                  setSelectedSubject(null);
+                }}
+                className="text-slate-400 hover:text-white"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-500 text-xs uppercase tracking-wider mb-1">Subject Name</label>
+                  <p className="text-white font-medium">{selectedSubject.name}</p>
+                </div>
+                <div>
+                  <label className="block text-slate-500 text-xs uppercase tracking-wider mb-1">Subject Code</label>
+                  <p className="text-white font-medium">{selectedSubject.code}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-500 text-xs uppercase tracking-wider mb-1">Category</label>
+                  <p className="text-white">{selectedSubject.category}</p>
+                </div>
+                <div>
+                  <label className="block text-slate-500 text-xs uppercase tracking-wider mb-1">Grade Level</label>
+                  <p className="text-white">{selectedSubject.gradeLevel}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-500 text-xs uppercase tracking-wider mb-1">Teacher</label>
+                  <p className="text-white">{selectedSubject.teacher}</p>
+                </div>
+                <div>
+                  <label className="block text-slate-500 text-xs uppercase tracking-wider mb-1">Credits</label>
+                  <p className="text-white">{selectedSubject.credits}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-500 text-xs uppercase tracking-wider mb-1">Students</label>
+                  <p className="text-white">{selectedSubject.students}</p>
+                </div>
+                <div>
+                  <label className="block text-slate-500 text-xs uppercase tracking-wider mb-1">Status</label>
+                  <span className={`badge ${getStatusBadge(selectedSubject.status)}`}>
+                    {selectedSubject.status}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-500 text-xs uppercase tracking-wider mb-1">Description</label>
+                <p className="text-white">{selectedSubject.description || "No description provided."}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 p-5 border-t border-slate-800">
+              <button
+                onClick={() => {
+                  setShowViewModal(false);
+                  setSelectedSubject(null);
+                }}
+                className="btn-secondary flex-1"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setShowViewModal(false);
+                  handleEdit(selectedSubject);
+                }}
+                className="btn-primary flex-1"
+              >
+                Edit
+              </button>
             </div>
           </div>
         </div>
