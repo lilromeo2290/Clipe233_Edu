@@ -16,6 +16,7 @@ interface ReceiptData {
 export default function FeesPage() {
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+  const [receiptNumber, setReceiptNumber] = useState("");
   const feedingRecords = [
     { id: "FD-001", studentId: "STU-001", name: "Emma Johnson", class: "Grade 10-A", dailyRate: 5, daysEnrolled: 20, daysAttended: 20, amountDue: 100, paid: 100, balance: 0, status: "Paid" },
     { id: "FD-002", studentId: "STU-002", name: "Liam Williams", class: "Grade 11-B", dailyRate: 5, daysEnrolled: 20, daysAttended: 18, amountDue: 100, paid: 50, balance: 50, status: "Partial" },
@@ -66,9 +67,10 @@ export default function FeesPage() {
   };
 
   const printReceipt = (record: typeof feeRecords[0]) => {
-    const receiptId = `${record.studentId}-${record.term.replace(/\s/g, "")}`;
+    const defaultReceiptId = `RCP-${record.studentId}-${record.term.replace(/\s/g, "")}`;
+    setReceiptNumber(defaultReceiptId);
     const receipt: ReceiptData = {
-      id: `RCP-${receiptId}`,
+      id: defaultReceiptId,
       studentName: record.name,
       studentId: record.studentId,
       class: record.class,
@@ -548,7 +550,13 @@ export default function FeesPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400 text-sm">Receipt No:</span>
-                  <span className="text-white font-mono text-sm">{receiptData.id}</span>
+                  <input
+                    type="text"
+                    value={receiptNumber}
+                    onChange={(e) => setReceiptNumber(e.target.value)}
+                    className="bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-white font-mono text-sm text-right w-48 focus:outline-none focus:border-blue-500"
+                    placeholder="Enter receipt number"
+                  />
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400 text-sm">Date:</span>

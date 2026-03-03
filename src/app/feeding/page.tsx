@@ -107,10 +107,13 @@ function getPaymentMethodColor(method: string): string {
 export default function FeedingPage() {
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState<FeedingReceipt | null>(null);
+  const [receiptNumber, setReceiptNumber] = useState("");
 
   const printFeedingReceipt = (student: Student) => {
+    const defaultReceiptId = `FD-${student.id}-${new Date().toISOString().split("T")[0].replace(/-/g, "")}`;
+    setReceiptNumber(defaultReceiptId);
     const receipt: FeedingReceipt = {
-      id: `FD-${student.id}-${new Date().toISOString().split("T")[0].replace(/-/g, "")}`,
+      id: defaultReceiptId,
       studentName: student.name,
       studentId: `STU-${String(student.id).padStart(3, "0")}`,
       class: student.class,
@@ -495,7 +498,13 @@ export default function FeedingPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400 text-sm">Receipt No:</span>
-                  <span className="text-white font-mono text-sm">{receiptData.id}</span>
+                  <input
+                    type="text"
+                    value={receiptNumber}
+                    onChange={(e) => setReceiptNumber(e.target.value)}
+                    className="bg-slate-800 border border-slate-600 rounded px-3 py-1.5 text-white font-mono text-sm text-right w-48 focus:outline-none focus:border-emerald-500"
+                    placeholder="Enter receipt number"
+                  />
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400 text-sm">Date:</span>
