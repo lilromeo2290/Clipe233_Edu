@@ -154,7 +154,87 @@ export default function Sidebar() {
         <p className="text-slate-600 text-xs font-semibold uppercase tracking-wider px-3 mb-3">
           Main Menu
         </p>
-        {navItems.map((item) => {
+        {navItems.slice(0, 1).map((item) => {
+          const isActive =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`sidebar-link ${isActive ? "active" : ""}`}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          );
+        })}
+
+        <p className="text-slate-600 text-xs font-semibold uppercase tracking-wider px-3 mt-6 mb-3">
+          Academic
+        </p>
+        {navItems.slice(1, 5).map((item) => {
+          const isActive =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`sidebar-link ${isActive ? "active" : ""}`}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          );
+        })}
+
+        <p className="text-slate-600 text-xs font-semibold uppercase tracking-wider px-3 mt-6 mb-3">
+          Performance
+        </p>
+        {navItems.slice(5, 7).map((item) => {
+          const isActive =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`sidebar-link ${isActive ? "active" : ""}`}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          );
+        })}
+
+        <p className="text-slate-600 text-xs font-semibold uppercase tracking-wider px-3 mt-6 mb-3">
+          Finance & Services
+        </p>
+        {navItems.slice(7, 9).map((item) => {
+          const isActive =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`sidebar-link ${isActive ? "active" : ""}`}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          );
+        })}
+
+        <p className="text-slate-600 text-xs font-semibold uppercase tracking-wider px-3 mt-6 mb-3">
+          Administration
+        </p>
+        {navItems.slice(9).map((item) => {
           const isActive =
             item.href === "/"
               ? pathname === "/"
