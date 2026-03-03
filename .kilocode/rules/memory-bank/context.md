@@ -113,3 +113,4 @@ export async function GET() {
 |------|---------|
 | Initial | Template created with base setup |
 | Today | Terminal Reports module added with report generation, student performance, grade summaries, export |
+| Today | Teachers Attendance module added with permission option (Present, Late, Permission, Leave) |
