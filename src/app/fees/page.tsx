@@ -13,19 +13,41 @@ interface ReceiptData {
   term: string;
 }
 
+// Data type definitions
+type FeeRecord = {
+  id: string;
+  studentId: string;
+  name: string;
+  class: string;
+  term: string;
+  amount: number;
+  paid: number;
+  balance: number;
+  dueDate: string;
+  status: string;
+};
+
+type FeedingRecord = {
+  id: string;
+  studentId: string;
+  name: string;
+  class: string;
+  dailyRate: number;
+  daysEnrolled: number;
+  daysAttended: number;
+  amountDue: number;
+  paid: number;
+  balance: number;
+  status: string;
+};
+
 export default function FeesPage() {
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
   const [receiptNumber, setReceiptNumber] = useState("");
   
-  // Payment modal state - using a union type to support both fee and feeding records
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<typeof feeRecords[0] | typeof feedingRecords[0] | null>(null);
-  const [paymentAmount, setPaymentAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Bank Transfer");
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const feedingRecords = [
+  // Data arrays - defined before state that uses them
+  const feedingRecords: FeedingRecord[] = [
     { id: "FD-001", studentId: "STU-001", name: "Emma Johnson", class: "Grade 10-A", dailyRate: 5, daysEnrolled: 20, daysAttended: 20, amountDue: 100, paid: 100, balance: 0, status: "Paid" },
     { id: "FD-002", studentId: "STU-002", name: "Liam Williams", class: "Grade 11-B", dailyRate: 5, daysEnrolled: 20, daysAttended: 18, amountDue: 100, paid: 50, balance: 50, status: "Partial" },
     { id: "FD-003", studentId: "STU-003", name: "Olivia Brown", class: "Grade 9-C", dailyRate: 5, daysEnrolled: 20, daysAttended: 20, amountDue: 100, paid: 100, balance: 0, status: "Paid" },
@@ -40,7 +62,7 @@ export default function FeesPage() {
   const totalFeedingCollected = feedingRecords.reduce((sum, r) => sum + r.paid, 0);
   const totalFeedingOutstanding = feedingRecords.reduce((sum, r) => sum + r.balance, 0);
 
-  const feeRecords = [
+  const feeRecords: FeeRecord[] = [
     { id: "FEE-001", studentId: "STU-001", name: "Emma Johnson", class: "Grade 10-A", term: "Term 1 2024", amount: 1500, paid: 1500, balance: 0, dueDate: "2024-02-15", status: "Paid" },
     { id: "FEE-002", studentId: "STU-002", name: "Liam Williams", class: "Grade 11-B", term: "Term 1 2024", amount: 1500, paid: 750, balance: 750, dueDate: "2024-02-15", status: "Partial" },
     { id: "FEE-003", studentId: "STU-003", name: "Olivia Brown", class: "Grade 9-C", term: "Term 1 2024", amount: 1200, paid: 1200, balance: 0, dueDate: "2024-02-15", status: "Paid" },
@@ -52,6 +74,32 @@ export default function FeesPage() {
     { id: "FEE-009", studentId: "STU-009", name: "Isabella Thomas", class: "Grade 10-C", term: "Term 1 2024", amount: 1500, paid: 1500, balance: 0, dueDate: "2024-03-01", status: "Paid" },
     { id: "FEE-010", studentId: "STU-010", name: "James Jackson", class: "Grade 11-C", term: "Term 1 2024", amount: 1500, paid: 0, balance: 1500, dueDate: "2024-03-15", status: "Pending" },
   ];
+
+  // Payment modal state - using a union type to support both fee and feeding records
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<FeeRecord | FeedingRecord | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Bank Transfer");
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split("T")[0]);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  
+  // Student search for payment modal
+  const [studentSearch, setStudentSearch] = useState("");
+  const [showStudentDropdown, setShowStudentDropdown] = useState(false);
+  
+  // Calculate outstanding balance based on payment amount
+  const calculateOutstanding = (): number => {
+    if (!selectedRecord) return 0;
+    const paid = parseFloat(paymentAmount) || 0;
+    const totalDue = 'amount' in selectedRecord ? selectedRecord.amount : selectedRecord.amountDue;
+    return Math.max(0, totalDue - selectedRecord.paid - paid);
+  };
+
+  // Combine all students from feeRecords and feedingRecords for search
+  const allStudents: (FeeRecord | FeedingRecord)[] = [...new Map([...feeRecords, ...feedingRecords].map(s => [s.studentId, s])).values()];
+  const filteredStudents = studentSearch.length > 0 
+    ? allStudents.filter(s => s.name.toLowerCase().includes(studentSearch.toLowerCase())) 
+    : [];
 
   const recentPayments = [
     { student: "Emma Johnson", amount: 1500, date: "2024-02-10", method: "Bank Transfer", receipt: "RCP-0041" },
@@ -117,6 +165,7 @@ export default function FeesPage() {
             const overdueRecord = feeRecords.find(r => r.balance > 0);
             if (overdueRecord) {
               setSelectedRecord(overdueRecord);
+              setStudentSearch(overdueRecord.name);
               setPaymentAmount(overdueRecord.balance.toString());
               setShowPaymentModal(true);
             }
@@ -291,6 +340,7 @@ export default function FeesPage() {
                           title="Record Payment"
                           onClick={() => {
                             setSelectedRecord(r);
+                            setStudentSearch(r.name);
                             setPaymentAmount(r.balance > 0 ? r.balance.toString() : "");
                             setShowPaymentModal(true);
                           }}
@@ -513,6 +563,7 @@ export default function FeesPage() {
                         title="Record Payment"
                         onClick={() => {
                           setSelectedRecord(r);
+                          setStudentSearch(r.name);
                           setPaymentAmount(r.balance > 0 ? r.balance.toString() : "");
                           setShowPaymentModal(true);
                         }}
@@ -687,12 +738,15 @@ export default function FeesPage() {
                 </div>
                 <h4 className="text-white font-semibold text-lg mb-2">Payment Recorded!</h4>
                 <p className="text-slate-400 text-sm mb-4">
-                  A receipt has been generated for {selectedRecord.name}
+                  A receipt has been generated for {selectedRecord?.name}
                 </p>
                 <button
                   onClick={() => {
                     setShowPaymentModal(false);
                     setPaymentSuccess(false);
+                    setStudentSearch("");
+                    setSelectedRecord(null);
+                    setPaymentAmount("");
                   }}
                   className="btn-primary w-full justify-center"
                 >
@@ -702,87 +756,146 @@ export default function FeesPage() {
             ) : (
               /* Payment Form */
               <div className="p-6 space-y-4">
-                {/* Student Info */}
-                <div className="bg-slate-800 rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-sm font-semibold text-slate-300">
-                      {selectedRecord.name.split(" ").map(n => n[0]).join("")}
+                {/* Student Search */}
+                <div className="relative">
+                  <label className="block text-slate-400 text-sm mb-2">Student Name</label>
+                  <input
+                    type="text"
+                    value={selectedRecord ? selectedRecord.name : studentSearch}
+                    onChange={(e) => {
+                      setStudentSearch(e.target.value);
+                      setSelectedRecord(null);
+                      setPaymentAmount("");
+                      setShowStudentDropdown(true);
+                    }}
+                    onFocus={() => setShowStudentDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowStudentDropdown(false), 200)}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    placeholder="Search student by name..."
+                  />
+                  {showStudentDropdown && filteredStudents.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {filteredStudents.map((student) => (
+                        <button
+                          key={student.studentId}
+                          onClick={() => {
+                            setSelectedRecord(student);
+                            setStudentSearch(student.name);
+                            setPaymentAmount("");
+                            setShowStudentDropdown(false);
+                          }}
+                          className="w-full text-left px-4 py-3 hover:bg-slate-700 transition-colors flex items-center justify-between"
+                        >
+                          <span className="text-white">{student.name}</span>
+                          <span className="text-slate-400 text-sm">{student.class}</span>
+                        </button>
+                      ))}
                     </div>
-                    <div>
-                      <p className="text-white font-medium">{selectedRecord.name}</p>
-                      <p className="text-slate-400 text-xs">{selectedRecord.class} • {selectedRecord.studentId}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-700">
-                    <div>
-                      <p className="text-slate-500 text-xs">Amount Due</p>
-                      <p className="text-white font-medium">${('amount' in selectedRecord ? selectedRecord.amount : selectedRecord.amountDue).toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500 text-xs">Already Paid</p>
-                      <p className="text-emerald-400 font-medium">${selectedRecord.paid.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-slate-500 text-xs">Balance</p>
-                      <p className="text-red-400 font-medium">${selectedRecord.balance.toLocaleString()}</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
+
+                {/* Student Info - shown when student is selected */}
+                {selectedRecord && (
+                  <div className="bg-slate-800 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-sm font-semibold text-slate-300">
+                        {selectedRecord.name.split(" ").map(n => n[0]).join("")}
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">{selectedRecord.name}</p>
+                        <p className="text-slate-400 text-xs">{selectedRecord.class} • {selectedRecord.studentId}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-700">
+                      <div>
+                        <p className="text-slate-500 text-xs">Amount Due</p>
+                        <p className="text-white font-medium">${('amount' in selectedRecord ? selectedRecord.amount : selectedRecord.amountDue).toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-500 text-xs">Already Paid</p>
+                        <p className="text-emerald-400 font-medium">${selectedRecord.paid.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-500 text-xs">Outstanding</p>
+                        <p className="text-red-400 font-medium">${selectedRecord.balance.toLocaleString()}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Payment Amount */}
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Payment Amount</label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
-                    <input
-                      type="number"
-                      value={paymentAmount}
-                      onChange={(e) => setPaymentAmount(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 pl-8 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                      placeholder="Enter amount"
-                    />
+                {selectedRecord && (
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-2">Amount to be Paid</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                      <input
+                        type="number"
+                        value={paymentAmount}
+                        onChange={(e) => setPaymentAmount(e.target.value)}
+                        className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 pl-8 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        placeholder="Enter amount"
+                      />
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <button 
+                        onClick={() => setPaymentAmount(selectedRecord.balance.toString())}
+                        className="text-xs text-blue-400 hover:text-blue-300"
+                      >
+                        Full Balance
+                      </button>
+                      <button 
+                        onClick={() => setPaymentAmount(Math.ceil(selectedRecord.balance / 2).toString())}
+                        className="text-xs text-slate-500 hover:text-slate-400"
+                      >
+                        Half Balance
+                      </button>
+                    </div>
+                    
+                    {/* Dynamic Outstanding Balance Calculation */}
+                    <div className="mt-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400 text-sm">Outstanding After Payment:</span>
+                        <span className={`font-semibold ${calculateOutstanding() === 0 ? 'text-emerald-400' : 'text-orange-400'}`}>
+                          ${calculateOutstanding().toLocaleString()}
+                        </span>
+                      </div>
+                      {calculateOutstanding() === 0 && (
+                        <p className="text-emerald-400 text-xs mt-1 text-center">✓ This payment will clear the balance</p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex gap-2 mt-2">
-                    <button 
-                      onClick={() => setPaymentAmount(selectedRecord.balance.toString())}
-                      className="text-xs text-blue-400 hover:text-blue-300"
-                    >
-                      Full Balance
-                    </button>
-                    <button 
-                      onClick={() => setPaymentAmount(Math.ceil(selectedRecord.balance / 2).toString())}
-                      className="text-xs text-slate-500 hover:text-slate-400"
-                    >
-                      Half Balance
-                    </button>
-                  </div>
-                </div>
+                )}
 
                 {/* Payment Method */}
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Payment Method</label>
-                  <select
-                    value={paymentMethod}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="Cash">Cash</option>
-                    <option value="Online">Online Payment</option>
-                    <option value="Cheque">Cheque</option>
-                  </select>
-                </div>
+                {selectedRecord && (
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-2">Payment Method</label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
+                    >
+                      <option value="Bank Transfer">Bank Transfer</option>
+                      <option value="Cash">Cash</option>
+                      <option value="Online">Online Payment</option>
+                      <option value="Cheque">Cheque</option>
+                    </select>
+                  </div>
+                )}
 
                 {/* Payment Date */}
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Payment Date</label>
-                  <input
-                    type="date"
-                    value={paymentDate}
-                    onChange={(e) => setPaymentDate(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
-                  />
-                </div>
+                {selectedRecord && (
+                  <div>
+                    <label className="block text-slate-400 text-sm mb-2">Payment Date</label>
+                    <input
+                      type="date"
+                      value={paymentDate}
+                      onChange={(e) => setPaymentDate(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                )}
 
                 {/* Submit Button */}
                 <button
@@ -790,7 +903,7 @@ export default function FeesPage() {
                     // In a real app, this would update the record in the database
                     setPaymentSuccess(true);
                   }}
-                  disabled={!paymentAmount || parseFloat(paymentAmount) <= 0}
+                  disabled={!selectedRecord || !paymentAmount || parseFloat(paymentAmount) <= 0 || parseFloat(paymentAmount) > calculateOutstanding() + selectedRecord.paid}
                   className="w-full btn-primary justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
