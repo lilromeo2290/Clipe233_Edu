@@ -19,6 +19,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Daily Feeding Fee section added to fees page (per-student tracking + fee structure column)
 - [x] Roles & Permissions module added (role cards, permission matrix, user assignments, audit log)
 - [x] Daily Feeding Fees module added (dedicated page with payment tracking, meal plans, monthly summary)
+- [x] Terminal Reports module added (report generation, student performance reports, grade summaries, export)
 
 ## Current Structure
 
@@ -35,6 +36,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 | `src/app/fees/page.tsx` | School fees tracking, payments, fee structure | ✅ Done |
 | `src/app/roles/page.tsx` | Roles & permissions management | ✅ Done |
 | `src/app/feeding/page.tsx` | Daily feeding fees tracking and management | ✅ Done |
+| `src/app/terminal-reports/page.tsx` | Terminal reports, grade summaries, export | ✅ Done |
 | `src/components/layout/Sidebar.tsx` | Sidebar navigation (client component) | ✅ Done |
 | `.kilocode/` | AI context & recipes | ✅ Ready |
 
@@ -47,6 +49,9 @@ School Management System is fully built. Features include:
 - Classes module: card grid with schedule, room, avg grade
 - Attendance module: daily class view, at-risk students, summary table
 - Grades module: distribution chart, top performers, full grade table
+- Fees module: payment tracking, fee structure, feeding fees
+- Roles module: role management, permissions, audit log
+- Terminal Reports module: report generation, student performance, grade summaries, export
 
 ## Quick Start Guide
 
@@ -101,3 +106,4 @@ export async function GET() {
 | Date | Changes |
 |------|---------|
 | Initial | Template created with base setup |
+| Today | Terminal Reports module added with report generation, student performance, grade summaries, export |
