@@ -941,7 +941,7 @@ export default function FeesPage() {
       {/* Record Payment Modal */}
       {showPaymentModal && selectedRecord && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-md">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-md max-h-[80vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
               <h3 className="text-white font-semibold">Record Payment</h3>
