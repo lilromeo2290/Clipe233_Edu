@@ -189,8 +189,8 @@ export default function ClassesPage() {
 
       {/* Add Class Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-hidden">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
               <h3 className="text-lg font-semibold text-white">Add New Class</h3>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white transition-colors">
@@ -284,8 +284,8 @@ export default function ClassesPage() {
 
       {/* Class Detail Modal with Student Table */}
       {selectedClass && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-hidden">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col custom-scrollbar">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 shrink-0">
               <div>
