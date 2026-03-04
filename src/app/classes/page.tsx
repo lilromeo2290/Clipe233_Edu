@@ -189,10 +189,10 @@ export default function ClassesPage() {
 
       {/* Add Class Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-            <div className="overflow-y-auto custom-scrollbar flex-1 p-6 space-y-6">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-hidden">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 shrink-0">
               <h3 className="text-lg font-semibold text-white">Add New Class</h3>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -201,7 +201,8 @@ export default function ClassesPage() {
                 </svg>
               </button>
             </div>
-            <div className="p-6 space-y-6">
+            {/* Content */}
+            <div className="overflow-y-auto custom-scrollbar flex-1 p-6 space-y-6">
               {/* Class Information */}
               <div>
                 <h4 className="text-white font-medium mb-4">Class Information</h4>
@@ -278,7 +279,6 @@ export default function ClassesPage() {
                   Add Class
                 </button>
               </div>
-            </div>
             </div>
           </div>
         </div>
