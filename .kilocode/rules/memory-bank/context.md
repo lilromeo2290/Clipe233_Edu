@@ -36,6 +36,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Class filter added to Fee Records table (filter by class)
 - [x] Fee Structure expanded with additional fee types (Lab Fee, Sports Fee, Technology Fee, Transport Fee, Development Fee)
 - [x] Fixed modal scrolling issues (Record Payment, Add Class, Class Detail modals)
+- [x] Fixed Add Class modal scrolling structure (flex container with scrollable content area)
 
 ## Current Structure
 
