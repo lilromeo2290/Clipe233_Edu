@@ -1151,8 +1151,8 @@ export default function FeesPage() {
       {/* Fee Configuration Modal */}
       {showConfigModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-lg">
-            <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-lg h-[80vh] overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
               <h3 className="text-white font-semibold">{editingConfig ? 'Edit Fee Structure' : 'Add Fee Structure'}</h3>
               <button 
                 onClick={() => {
@@ -1167,7 +1167,7 @@ export default function FeesPage() {
                 </svg>
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar min-h-0 flex-1">
               <div>
                 <label className="block text-slate-400 text-sm mb-2">Class / Grade Level</label>
                 <input
