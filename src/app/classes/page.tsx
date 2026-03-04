@@ -271,7 +271,7 @@ export default function ClassesPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800 shrink-0">
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-800 shrink-0">
                 <button onClick={() => setShowAddModal(false)} className="btn-secondary">
                   Cancel
                 </button>
