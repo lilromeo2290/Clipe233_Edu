@@ -35,6 +35,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Record Payment works for both school fees and daily feeding fees tables
 - [x] Class filter added to Fee Records table (filter by class)
 - [x] Fee Structure expanded with additional fee types (Lab Fee, Sports Fee, Technology Fee, Transport Fee, Development Fee)
+- [x] Fixed modal scrolling issues (Record Payment, Add Class, Class Detail modals)
 
 ## Current Structure
 
