@@ -33,6 +33,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Individual Student Reports grouped by class with collapsible sections
 - [x] Record Payment modal added to Fees page (student info, payment form, quick amount buttons, success state)
 - [x] Record Payment works for both school fees and daily feeding fees tables
+- [x] Class filter added to Fee Records table (filter by class)
 
 ## Current Structure
 
@@ -127,3 +128,4 @@ export async function GET() {
 | Today | Teachers Attendance module added with permission option (Present, Late, Permission, Leave) |
 | Today | Configurable grading scheme added to Grades page (edit letter grades, GPA, score ranges, descriptions)
 | Today | Individual Student Reports grouped by class with collapsible sections
+| Today | Class filter added to Fee Records table (filter by class)
