@@ -201,7 +201,7 @@ export default function ClassesPage() {
                 </svg>
               </button>
             </div>
-            {/* Content */}
+            {/* Content - scrollable */}
             <div className="overflow-y-auto custom-scrollbar flex-1 p-6 space-y-6">
               {/* Class Information */}
               <div>
@@ -269,16 +269,16 @@ export default function ClassesPage() {
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Actions */}
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-800 shrink-0">
-                <button onClick={() => setShowAddModal(false)} className="btn-secondary">
-                  Cancel
-                </button>
-                <button onClick={handleAddClass} className="btn-primary">
-                  Add Class
-                </button>
-              </div>
+            {/* Actions - fixed at bottom */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-800 shrink-0">
+              <button onClick={() => setShowAddModal(false)} className="btn-secondary">
+                Cancel
+              </button>
+              <button onClick={handleAddClass} className="btn-primary">
+                Add Class
+              </button>
             </div>
           </div>
         </div>
