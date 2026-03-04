@@ -109,6 +109,17 @@ export default function FeesPage() {
   const [studentSearch, setStudentSearch] = useState("");
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
   
+  // Class filter for fee records
+  const [classFilter, setClassFilter] = useState("All");
+  
+  // Get unique classes from fee records
+  const classes = ["All", ...new Set(feeRecords.map(r => r.class))];
+  
+  // Filter fee records by class
+  const filteredFeeRecords = classFilter === "All" 
+    ? feeRecords 
+    : feeRecords.filter(r => r.class === classFilter);
+  
   // Fee Configuration state
   const [feeConfigs, setFeeConfigs] = useState<FeeConfig[]>(defaultFeeConfigs);
   const [showConfigModal, setShowConfigModal] = useState(false);
@@ -396,6 +407,15 @@ export default function FeesPage() {
                 placeholder="Search student..."
                 className="search-input w-48"
               />
+              <select 
+                className="search-input text-sm pr-8"
+                value={classFilter}
+                onChange={(e) => setClassFilter(e.target.value)}
+              >
+                {classes.map(c => (
+                  <option key={c} value={c}>{c === "All" ? "All Classes" : c}</option>
+                ))}
+              </select>
               <select className="search-input text-sm pr-8">
                 <option>All Status</option>
                 <option>Paid</option>
@@ -420,7 +440,7 @@ export default function FeesPage() {
                 </tr>
               </thead>
               <tbody>
-                {feeRecords.map((r) => (
+                {filteredFeeRecords.map((r) => (
                   <tr key={r.id}>
                     <td>
                       <div className="flex items-center gap-2">
