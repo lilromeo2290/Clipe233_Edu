@@ -41,6 +41,28 @@ type FeedingRecord = {
   status: string;
 };
 
+// Fee Configuration type
+interface FeeConfig {
+  id: string;
+  className: string;
+  tuitionFee: number;
+  registrationFee: number;
+  booksFee: number;
+  uniformFee: number;
+  otherFees: number;
+  dueDate: string;
+  term: string;
+  academicYear: string;
+}
+
+// Default fee configurations by class
+const defaultFeeConfigs: FeeConfig[] = [
+  { id: "1", className: "Grade 9", tuitionFee: 800, registrationFee: 100, booksFee: 150, uniformFee: 100, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "2", className: "Grade 10", tuitionFee: 900, registrationFee: 100, booksFee: 200, uniformFee: 100, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "3", className: "Grade 11", tuitionFee: 1000, registrationFee: 100, booksFee: 250, uniformFee: 100, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "4", className: "Grade 12", tuitionFee: 1200, registrationFee: 100, booksFee: 300, uniformFee: 100, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+];
+
 export default function FeesPage() {
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
@@ -87,12 +109,111 @@ export default function FeesPage() {
   const [studentSearch, setStudentSearch] = useState("");
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
   
+  // Fee Configuration state
+  const [feeConfigs, setFeeConfigs] = useState<FeeConfig[]>(defaultFeeConfigs);
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [editingConfig, setEditingConfig] = useState<FeeConfig | null>(null);
+  const [newConfig, setNewConfig] = useState<Partial<FeeConfig>>({
+    className: "",
+    tuitionFee: 0,
+    registrationFee: 0,
+    booksFee: 0,
+    uniformFee: 0,
+    otherFees: 0,
+    dueDate: "",
+    term: "First Term",
+    academicYear: "2025-2026"
+  });
+  
   // Calculate outstanding balance based on payment amount
   const calculateOutstanding = (): number => {
     if (!selectedRecord) return 0;
     const paid = parseFloat(paymentAmount) || 0;
     const totalDue = 'amount' in selectedRecord ? selectedRecord.amount : selectedRecord.amountDue;
     return Math.max(0, totalDue - selectedRecord.paid - paid);
+  };
+
+  // Fee Configuration handlers
+  const handleAddConfig = () => {
+    if (!newConfig.className || !newConfig.dueDate) return;
+    const config: FeeConfig = {
+      id: Date.now().toString(),
+      className: newConfig.className!,
+      tuitionFee: newConfig.tuitionFee || 0,
+      registrationFee: newConfig.registrationFee || 0,
+      booksFee: newConfig.booksFee || 0,
+      uniformFee: newConfig.uniformFee || 0,
+      otherFees: newConfig.otherFees || 0,
+      dueDate: newConfig.dueDate!,
+      term: newConfig.term || "First Term",
+      academicYear: newConfig.academicYear || "2025-2026"
+    };
+    setFeeConfigs([...feeConfigs, config]);
+    setNewConfig({
+      className: "",
+      tuitionFee: 0,
+      registrationFee: 0,
+      booksFee: 0,
+      uniformFee: 0,
+      otherFees: 0,
+      dueDate: "",
+      term: "First Term",
+      academicYear: "2025-2026"
+    });
+    setShowConfigModal(false);
+  };
+
+  const handleEditConfig = (config: FeeConfig) => {
+    setEditingConfig(config);
+    setNewConfig({
+      className: config.className,
+      tuitionFee: config.tuitionFee,
+      registrationFee: config.registrationFee,
+      booksFee: config.booksFee,
+      uniformFee: config.uniformFee,
+      otherFees: config.otherFees,
+      dueDate: config.dueDate,
+      term: config.term,
+      academicYear: config.academicYear
+    });
+    setShowConfigModal(true);
+  };
+
+  const handleUpdateConfig = () => {
+    if (!editingConfig || !newConfig.className || !newConfig.dueDate) return;
+    setFeeConfigs(feeConfigs.map(c =>
+      c.id === editingConfig.id
+        ? {
+            ...c,
+            className: newConfig.className!,
+            tuitionFee: newConfig.tuitionFee || 0,
+            registrationFee: newConfig.registrationFee || 0,
+            booksFee: newConfig.booksFee || 0,
+            uniformFee: newConfig.uniformFee || 0,
+            otherFees: newConfig.otherFees || 0,
+            dueDate: newConfig.dueDate!,
+            term: newConfig.term || "First Term",
+            academicYear: newConfig.academicYear || "2025-2026"
+          }
+        : c
+    ));
+    setEditingConfig(null);
+    setNewConfig({
+      className: "",
+      tuitionFee: 0,
+      registrationFee: 0,
+      booksFee: 0,
+      uniformFee: 0,
+      otherFees: 0,
+      dueDate: "",
+      term: "First Term",
+      academicYear: "2025-2026"
+    });
+    setShowConfigModal(false);
+  };
+
+  const handleDeleteConfig = (id: string) => {
+    setFeeConfigs(feeConfigs.filter(c => c.id !== id));
   };
 
   // Combine all students from feeRecords and feedingRecords for search
@@ -410,48 +531,88 @@ export default function FeesPage() {
 
       {/* Fee Structure */}
       <div className="page-card">
-        <div className="px-6 py-4 border-b border-slate-800">
-          <h2 className="text-white font-semibold">Fee Structure</h2>
-          <p className="text-slate-500 text-xs mt-0.5">Annual fee breakdown by grade level</p>
+        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+          <div>
+            <h2 className="text-white font-semibold">Fee Structure</h2>
+            <p className="text-slate-500 text-xs mt-0.5">Configure fee breakdown by class/grade level</p>
+          </div>
+          <button 
+            className="btn-primary text-sm"
+            onClick={() => {
+              setEditingConfig(null);
+              setNewConfig({
+                className: "",
+                tuitionFee: 0,
+                registrationFee: 0,
+                booksFee: 0,
+                uniformFee: 0,
+                otherFees: 0,
+                dueDate: "",
+                term: "First Term",
+                academicYear: "2025-2026"
+              });
+              setShowConfigModal(true);
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Add Class
+          </button>
         </div>
         <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
               <tr>
-                <th>Grade Level</th>
-                <th>Tuition Fee</th>
-                <th>Activity Fee</th>
-                <th>Lab Fee</th>
-                <th>Library Fee</th>
-                <th>Feeding Fee / Term</th>
-                <th>Total / Term</th>
-                <th>Annual Total</th>
+                <th>Class</th>
+                <th>Tuition</th>
+                <th>Registration</th>
+                <th>Books</th>
+                <th>Uniform</th>
+                <th>Other</th>
+                <th>Total</th>
+                <th>Due Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {[
-                { grade: "Grade 9", tuition: 800, activity: 150, lab: 100, library: 50, feedingDailyRate: 5, schoolDays: 20 },
-                { grade: "Grade 10", tuition: 900, activity: 150, lab: 150, library: 50, feedingDailyRate: 5, schoolDays: 20 },
-                { grade: "Grade 11", tuition: 1000, activity: 200, lab: 200, library: 50, feedingDailyRate: 5, schoolDays: 20 },
-                { grade: "Grade 12", tuition: 1200, activity: 200, lab: 250, library: 50, feedingDailyRate: 5, schoolDays: 20 },
-              ].map((row) => {
-                const feedingTerm = row.feedingDailyRate * row.schoolDays;
-                const termTotal = row.tuition + row.activity + row.lab + row.library + feedingTerm;
+              {feeConfigs.map((config) => {
+                const total = config.tuitionFee + config.registrationFee + config.booksFee + config.uniformFee + config.otherFees;
                 return (
-                  <tr key={row.grade}>
-                    <td className="text-white font-medium">{row.grade}</td>
-                    <td>${row.tuition.toLocaleString()}</td>
-                    <td>${row.activity.toLocaleString()}</td>
-                    <td>${row.lab.toLocaleString()}</td>
-                    <td>${row.library.toLocaleString()}</td>
+                  <tr key={config.id}>
+                    <td className="text-white font-medium">{config.className}</td>
+                    <td className="text-blue-400">${config.tuitionFee.toLocaleString()}</td>
+                    <td>${config.registrationFee.toLocaleString()}</td>
+                    <td>${config.booksFee.toLocaleString()}</td>
+                    <td>${config.uniformFee.toLocaleString()}</td>
+                    <td>${config.otherFees.toLocaleString()}</td>
+                    <td className="text-emerald-400 font-semibold">${total.toLocaleString()}</td>
+                    <td className="text-slate-400">{config.dueDate}</td>
                     <td>
-                      <div>
-                        <span className="text-orange-400 font-medium">${feedingTerm.toLocaleString()}</span>
-                        <span className="text-slate-500 text-xs ml-1">(${row.feedingDailyRate}/day × {row.schoolDays} days)</span>
+                      <div className="flex items-center gap-2">
+                        <button 
+                          className="text-slate-400 hover:text-blue-400 transition-colors p-1"
+                          title="Edit"
+                          onClick={() => handleEditConfig(config)}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        </button>
+                        <button 
+                          className="text-slate-400 hover:text-red-400 transition-colors p-1"
+                          title="Delete"
+                          onClick={() => handleDeleteConfig(config.id)}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                        </button>
                       </div>
                     </td>
-                    <td className="text-blue-400 font-semibold">${termTotal.toLocaleString()}</td>
-                    <td className="text-emerald-400 font-semibold">${(termTotal * 3).toLocaleString()}</td>
                   </tr>
                 );
               })}
@@ -913,6 +1074,142 @@ export default function FeesPage() {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Fee Configuration Modal */}
+      {showConfigModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-lg">
+            <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+              <h3 className="text-white font-semibold">{editingConfig ? 'Edit Fee Structure' : 'Add Fee Structure'}</h3>
+              <button 
+                onClick={() => {
+                  setShowConfigModal(false);
+                  setEditingConfig(null);
+                }}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-slate-400 text-sm mb-2">Class / Grade Level</label>
+                <input
+                  type="text"
+                  value={newConfig.className}
+                  onChange={(e) => setNewConfig({ ...newConfig, className: e.target.value })}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  placeholder="e.g., Grade 9 or Form 1"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Tuition Fee ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.tuitionFee}
+                    onChange={(e) => setNewConfig({ ...newConfig, tuitionFee: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Registration Fee ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.registrationFee}
+                    onChange={(e) => setNewConfig({ ...newConfig, registrationFee: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Books Fee ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.booksFee}
+                    onChange={(e) => setNewConfig({ ...newConfig, booksFee: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Uniform Fee ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.uniformFee}
+                    onChange={(e) => setNewConfig({ ...newConfig, uniformFee: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Other Fees ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.otherFees}
+                    onChange={(e) => setNewConfig({ ...newConfig, otherFees: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Due Date</label>
+                  <input
+                    type="date"
+                    value={newConfig.dueDate}
+                    onChange={(e) => setNewConfig({ ...newConfig, dueDate: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Term</label>
+                  <select
+                    value={newConfig.term}
+                    onChange={(e) => setNewConfig({ ...newConfig, term: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="First Term">First Term</option>
+                    <option value="Second Term">Second Term</option>
+                    <option value="Third Term">Third Term</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Academic Year</label>
+                  <select
+                    value={newConfig.academicYear}
+                    onChange={(e) => setNewConfig({ ...newConfig, academicYear: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="2025-2026">2025-2026</option>
+                    <option value="2026-2027">2026-2027</option>
+                    <option value="2027-2028">2027-2028</option>
+                  </select>
+                </div>
+              </div>
+              <div className="pt-4 flex gap-3">
+                <button
+                  onClick={editingConfig ? handleUpdateConfig : handleAddConfig}
+                  className="flex-1 btn-primary justify-center"
+                >
+                  {editingConfig ? 'Update Fee Structure' : 'Add Fee Structure'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowConfigModal(false);
+                    setEditingConfig(null);
+                  }}
+                  className="flex-1 btn-secondary justify-center"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
