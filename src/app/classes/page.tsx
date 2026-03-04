@@ -189,8 +189,9 @@ export default function ClassesPage() {
 
       {/* Add Class Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-hidden">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div className="overflow-y-auto custom-scrollbar flex-1 p-6 space-y-6">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
               <h3 className="text-lg font-semibold text-white">Add New Class</h3>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white transition-colors">
@@ -269,7 +270,7 @@ export default function ClassesPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800 shrink-0">
                 <button onClick={() => setShowAddModal(false)} className="btn-secondary">
                   Cancel
                 </button>
@@ -277,6 +278,7 @@ export default function ClassesPage() {
                   Add Class
                 </button>
               </div>
+            </div>
             </div>
           </div>
         </div>
