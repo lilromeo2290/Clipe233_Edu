@@ -49,6 +49,11 @@ interface FeeConfig {
   registrationFee: number;
   booksFee: number;
   uniformFee: number;
+  labFee: number;
+  sportsFee: number;
+  technologyFee: number;
+  transportFee: number;
+  developmentFee: number;
   otherFees: number;
   dueDate: string;
   term: string;
@@ -57,10 +62,10 @@ interface FeeConfig {
 
 // Default fee configurations by class
 const defaultFeeConfigs: FeeConfig[] = [
-  { id: "1", className: "Grade 9", tuitionFee: 800, registrationFee: 100, booksFee: 150, uniformFee: 100, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
-  { id: "2", className: "Grade 10", tuitionFee: 900, registrationFee: 100, booksFee: 200, uniformFee: 100, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
-  { id: "3", className: "Grade 11", tuitionFee: 1000, registrationFee: 100, booksFee: 250, uniformFee: 100, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
-  { id: "4", className: "Grade 12", tuitionFee: 1200, registrationFee: 100, booksFee: 300, uniformFee: 100, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "1", className: "Grade 9", tuitionFee: 800, registrationFee: 100, booksFee: 150, uniformFee: 100, labFee: 50, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "2", className: "Grade 10", tuitionFee: 900, registrationFee: 100, booksFee: 200, uniformFee: 100, labFee: 50, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "3", className: "Grade 11", tuitionFee: 1000, registrationFee: 100, booksFee: 250, uniformFee: 100, labFee: 75, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "4", className: "Grade 12", tuitionFee: 1200, registrationFee: 100, booksFee: 300, uniformFee: 100, labFee: 75, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
 ];
 
 export default function FeesPage() {
@@ -130,6 +135,11 @@ export default function FeesPage() {
     registrationFee: 0,
     booksFee: 0,
     uniformFee: 0,
+    labFee: 0,
+    sportsFee: 0,
+    technologyFee: 0,
+    transportFee: 0,
+    developmentFee: 0,
     otherFees: 0,
     dueDate: "",
     term: "First Term",
@@ -154,6 +164,11 @@ export default function FeesPage() {
       registrationFee: newConfig.registrationFee || 0,
       booksFee: newConfig.booksFee || 0,
       uniformFee: newConfig.uniformFee || 0,
+      labFee: newConfig.labFee || 0,
+      sportsFee: newConfig.sportsFee || 0,
+      technologyFee: newConfig.technologyFee || 0,
+      transportFee: newConfig.transportFee || 0,
+      developmentFee: newConfig.developmentFee || 0,
       otherFees: newConfig.otherFees || 0,
       dueDate: newConfig.dueDate!,
       term: newConfig.term || "First Term",
@@ -166,6 +181,11 @@ export default function FeesPage() {
       registrationFee: 0,
       booksFee: 0,
       uniformFee: 0,
+      labFee: 0,
+      sportsFee: 0,
+      technologyFee: 0,
+      transportFee: 0,
+      developmentFee: 0,
       otherFees: 0,
       dueDate: "",
       term: "First Term",
@@ -182,6 +202,11 @@ export default function FeesPage() {
       registrationFee: config.registrationFee,
       booksFee: config.booksFee,
       uniformFee: config.uniformFee,
+      labFee: config.labFee,
+      sportsFee: config.sportsFee,
+      technologyFee: config.technologyFee,
+      transportFee: config.transportFee,
+      developmentFee: config.developmentFee,
       otherFees: config.otherFees,
       dueDate: config.dueDate,
       term: config.term,
@@ -201,6 +226,11 @@ export default function FeesPage() {
             registrationFee: newConfig.registrationFee || 0,
             booksFee: newConfig.booksFee || 0,
             uniformFee: newConfig.uniformFee || 0,
+            labFee: newConfig.labFee || 0,
+            sportsFee: newConfig.sportsFee || 0,
+            technologyFee: newConfig.technologyFee || 0,
+            transportFee: newConfig.transportFee || 0,
+            developmentFee: newConfig.developmentFee || 0,
             otherFees: newConfig.otherFees || 0,
             dueDate: newConfig.dueDate!,
             term: newConfig.term || "First Term",
@@ -215,6 +245,11 @@ export default function FeesPage() {
       registrationFee: 0,
       booksFee: 0,
       uniformFee: 0,
+      labFee: 0,
+      sportsFee: 0,
+      technologyFee: 0,
+      transportFee: 0,
+      developmentFee: 0,
       otherFees: 0,
       dueDate: "",
       term: "First Term",
@@ -566,6 +601,11 @@ export default function FeesPage() {
                 registrationFee: 0,
                 booksFee: 0,
                 uniformFee: 0,
+                labFee: 0,
+                sportsFee: 0,
+                technologyFee: 0,
+                transportFee: 0,
+                developmentFee: 0,
                 otherFees: 0,
                 dueDate: "",
                 term: "First Term",
@@ -590,6 +630,11 @@ export default function FeesPage() {
                 <th>Registration</th>
                 <th>Books</th>
                 <th>Uniform</th>
+                <th>Lab</th>
+                <th>Sports</th>
+                <th>Technology</th>
+                <th>Transport</th>
+                <th>Development</th>
                 <th>Other</th>
                 <th>Total</th>
                 <th>Due Date</th>
@@ -598,7 +643,7 @@ export default function FeesPage() {
             </thead>
             <tbody>
               {feeConfigs.map((config) => {
-                const total = config.tuitionFee + config.registrationFee + config.booksFee + config.uniformFee + config.otherFees;
+                const total = config.tuitionFee + config.registrationFee + config.booksFee + config.uniformFee + config.labFee + config.sportsFee + config.technologyFee + config.transportFee + config.developmentFee + config.otherFees;
                 return (
                   <tr key={config.id}>
                     <td className="text-white font-medium">{config.className}</td>
@@ -606,6 +651,11 @@ export default function FeesPage() {
                     <td>${config.registrationFee.toLocaleString()}</td>
                     <td>${config.booksFee.toLocaleString()}</td>
                     <td>${config.uniformFee.toLocaleString()}</td>
+                    <td className="text-purple-400">${config.labFee.toLocaleString()}</td>
+                    <td className="text-green-400">${config.sportsFee.toLocaleString()}</td>
+                    <td className="text-cyan-400">${config.technologyFee.toLocaleString()}</td>
+                    <td className="text-orange-400">${config.transportFee.toLocaleString()}</td>
+                    <td className="text-pink-400">${config.developmentFee.toLocaleString()}</td>
                     <td>${config.otherFees.toLocaleString()}</td>
                     <td className="text-emerald-400 font-semibold">${total.toLocaleString()}</td>
                     <td className="text-slate-400">{config.dueDate}</td>
@@ -1165,8 +1215,51 @@ export default function FeesPage() {
                     className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Lab Fee ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.labFee}
+                    onChange={(e) => setNewConfig({ ...newConfig, labFee: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Sports Fee ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.sportsFee}
+                    onChange={(e) => setNewConfig({ ...newConfig, sportsFee: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Technology Fee ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.technologyFee}
+                    onChange={(e) => setNewConfig({ ...newConfig, technologyFee: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Transport Fee ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.transportFee}
+                    onChange={(e) => setNewConfig({ ...newConfig, transportFee: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-sm mb-2">Development Fee ($)</label>
+                  <input
+                    type="number"
+                    value={newConfig.developmentFee}
+                    onChange={(e) => setNewConfig({ ...newConfig, developmentFee: parseFloat(e.target.value) || 0 })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
                 <div>
                   <label className="block text-slate-400 text-sm mb-2">Other Fees ($)</label>
                   <input
@@ -1176,6 +1269,8 @@ export default function FeesPage() {
                     className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-slate-400 text-sm mb-2">Due Date</label>
                   <input
@@ -1185,8 +1280,6 @@ export default function FeesPage() {
                     className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-slate-400 text-sm mb-2">Term</label>
                   <select
@@ -1199,18 +1292,18 @@ export default function FeesPage() {
                     <option value="Third Term">Third Term</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Academic Year</label>
-                  <select
-                    value={newConfig.academicYear}
-                    onChange={(e) => setNewConfig({ ...newConfig, academicYear: e.target.value })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
-                  >
-                    <option value="2025-2026">2025-2026</option>
-                    <option value="2026-2027">2026-2027</option>
-                    <option value="2027-2028">2027-2028</option>
-                  </select>
-                </div>
+              </div>
+              <div>
+                <label className="block text-slate-400 text-sm mb-2">Academic Year</label>
+                <select
+                  value={newConfig.academicYear}
+                  onChange={(e) => setNewConfig({ ...newConfig, academicYear: e.target.value })}
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="2025-2026">2025-2026</option>
+                  <option value="2026-2027">2026-2027</option>
+                  <option value="2027-2028">2027-2028</option>
+                </select>
               </div>
               <div className="pt-4 flex gap-3">
                 <button
