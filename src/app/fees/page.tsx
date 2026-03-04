@@ -41,20 +41,33 @@ type FeedingRecord = {
   status: string;
 };
 
+// Fee Type definition interface
+interface FeeType {
+  id: string;
+  name: string;
+  key: string; // used as property name
+  defaultAmount: number;
+}
+
+// Default fee types
+const defaultFeeTypes: FeeType[] = [
+  { id: "1", name: "Tuition Fee", key: "tuitionFee", defaultAmount: 800 },
+  { id: "2", name: "Registration Fee", key: "registrationFee", defaultAmount: 100 },
+  { id: "3", name: "Books Fee", key: "booksFee", defaultAmount: 150 },
+  { id: "4", name: "Uniform Fee", key: "uniformFee", defaultAmount: 100 },
+  { id: "5", name: "Lab Fee", key: "labFee", defaultAmount: 50 },
+  { id: "6", name: "Sports Fee", key: "sportsFee", defaultAmount: 30 },
+  { id: "7", name: "Technology Fee", key: "technologyFee", defaultAmount: 40 },
+  { id: "8", name: "Transport Fee", key: "transportFee", defaultAmount: 0 },
+  { id: "9", name: "Development Fee", key: "developmentFee", defaultAmount: 25 },
+  { id: "10", name: "Other Fees", key: "otherFees", defaultAmount: 50 },
+];
+
 // Fee Configuration type
 interface FeeConfig {
   id: string;
   className: string;
-  tuitionFee: number;
-  registrationFee: number;
-  booksFee: number;
-  uniformFee: number;
-  labFee: number;
-  sportsFee: number;
-  technologyFee: number;
-  transportFee: number;
-  developmentFee: number;
-  otherFees: number;
+  fees: Record<string, number>; // Dynamic fee amounts by fee type key
   dueDate: string;
   term: string;
   academicYear: string;
@@ -62,10 +75,10 @@ interface FeeConfig {
 
 // Default fee configurations by class
 const defaultFeeConfigs: FeeConfig[] = [
-  { id: "1", className: "Grade 9", tuitionFee: 800, registrationFee: 100, booksFee: 150, uniformFee: 100, labFee: 50, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
-  { id: "2", className: "Grade 10", tuitionFee: 900, registrationFee: 100, booksFee: 200, uniformFee: 100, labFee: 50, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
-  { id: "3", className: "Grade 11", tuitionFee: 1000, registrationFee: 100, booksFee: 250, uniformFee: 100, labFee: 75, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
-  { id: "4", className: "Grade 12", tuitionFee: 1200, registrationFee: 100, booksFee: 300, uniformFee: 100, labFee: 75, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "1", className: "Grade 9", fees: { tuitionFee: 800, registrationFee: 100, booksFee: 150, uniformFee: 100, labFee: 50, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50 }, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "2", className: "Grade 10", fees: { tuitionFee: 900, registrationFee: 100, booksFee: 200, uniformFee: 100, labFee: 50, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50 }, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "3", className: "Grade 11", fees: { tuitionFee: 1000, registrationFee: 100, booksFee: 250, uniformFee: 100, labFee: 75, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50 }, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
+  { id: "4", className: "Grade 12", fees: { tuitionFee: 1200, registrationFee: 100, booksFee: 300, uniformFee: 100, labFee: 75, sportsFee: 30, technologyFee: 40, transportFee: 0, developmentFee: 25, otherFees: 50 }, dueDate: "2026-02-15", term: "First Term", academicYear: "2025-2026" },
 ];
 
 export default function FeesPage() {
@@ -127,24 +140,18 @@ export default function FeesPage() {
   
   // Fee Configuration state
   const [feeConfigs, setFeeConfigs] = useState<FeeConfig[]>(defaultFeeConfigs);
+  const [feeTypes, setFeeTypes] = useState<FeeType[]>(defaultFeeTypes);
   const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showFeeTypesModal, setShowFeeTypesModal] = useState(false);
   const [editingConfig, setEditingConfig] = useState<FeeConfig | null>(null);
-  const [newConfig, setNewConfig] = useState<Partial<FeeConfig>>({
+  const [newConfig, setNewConfig] = useState<{ className: string; fees: Record<string, number>; dueDate: string; term: string; academicYear: string }>({
     className: "",
-    tuitionFee: 0,
-    registrationFee: 0,
-    booksFee: 0,
-    uniformFee: 0,
-    labFee: 0,
-    sportsFee: 0,
-    technologyFee: 0,
-    transportFee: 0,
-    developmentFee: 0,
-    otherFees: 0,
+    fees: {},
     dueDate: "",
     term: "First Term",
     academicYear: "2025-2026"
   });
+  const [newFeeType, setNewFeeType] = useState({ name: "", defaultAmount: 0 });
   
   // Calculate outstanding balance based on payment amount
   const calculateOutstanding = (): number => {
@@ -157,36 +164,23 @@ export default function FeesPage() {
   // Fee Configuration handlers
   const handleAddConfig = () => {
     if (!newConfig.className || !newConfig.dueDate) return;
+    // Build fees object from feeTypes, using values from newConfig or defaults
+    const fees: Record<string, number> = {};
+    feeTypes.forEach(ft => {
+      fees[ft.key] = newConfig.fees[ft.key] || ft.defaultAmount;
+    });
     const config: FeeConfig = {
       id: Date.now().toString(),
-      className: newConfig.className!,
-      tuitionFee: newConfig.tuitionFee || 0,
-      registrationFee: newConfig.registrationFee || 0,
-      booksFee: newConfig.booksFee || 0,
-      uniformFee: newConfig.uniformFee || 0,
-      labFee: newConfig.labFee || 0,
-      sportsFee: newConfig.sportsFee || 0,
-      technologyFee: newConfig.technologyFee || 0,
-      transportFee: newConfig.transportFee || 0,
-      developmentFee: newConfig.developmentFee || 0,
-      otherFees: newConfig.otherFees || 0,
-      dueDate: newConfig.dueDate!,
+      className: newConfig.className,
+      fees,
+      dueDate: newConfig.dueDate,
       term: newConfig.term || "First Term",
       academicYear: newConfig.academicYear || "2025-2026"
     };
     setFeeConfigs([...feeConfigs, config]);
     setNewConfig({
       className: "",
-      tuitionFee: 0,
-      registrationFee: 0,
-      booksFee: 0,
-      uniformFee: 0,
-      labFee: 0,
-      sportsFee: 0,
-      technologyFee: 0,
-      transportFee: 0,
-      developmentFee: 0,
-      otherFees: 0,
+      fees: {},
       dueDate: "",
       term: "First Term",
       academicYear: "2025-2026"
@@ -198,16 +192,7 @@ export default function FeesPage() {
     setEditingConfig(config);
     setNewConfig({
       className: config.className,
-      tuitionFee: config.tuitionFee,
-      registrationFee: config.registrationFee,
-      booksFee: config.booksFee,
-      uniformFee: config.uniformFee,
-      labFee: config.labFee,
-      sportsFee: config.sportsFee,
-      technologyFee: config.technologyFee,
-      transportFee: config.transportFee,
-      developmentFee: config.developmentFee,
-      otherFees: config.otherFees,
+      fees: { ...config.fees },
       dueDate: config.dueDate,
       term: config.term,
       academicYear: config.academicYear
@@ -217,22 +202,18 @@ export default function FeesPage() {
 
   const handleUpdateConfig = () => {
     if (!editingConfig || !newConfig.className || !newConfig.dueDate) return;
+    // Build updated fees object from feeTypes
+    const fees: Record<string, number> = {};
+    feeTypes.forEach(ft => {
+      fees[ft.key] = newConfig.fees[ft.key] || 0;
+    });
     setFeeConfigs(feeConfigs.map(c =>
       c.id === editingConfig.id
         ? {
             ...c,
-            className: newConfig.className!,
-            tuitionFee: newConfig.tuitionFee || 0,
-            registrationFee: newConfig.registrationFee || 0,
-            booksFee: newConfig.booksFee || 0,
-            uniformFee: newConfig.uniformFee || 0,
-            labFee: newConfig.labFee || 0,
-            sportsFee: newConfig.sportsFee || 0,
-            technologyFee: newConfig.technologyFee || 0,
-            transportFee: newConfig.transportFee || 0,
-            developmentFee: newConfig.developmentFee || 0,
-            otherFees: newConfig.otherFees || 0,
-            dueDate: newConfig.dueDate!,
+            className: newConfig.className,
+            fees,
+            dueDate: newConfig.dueDate,
             term: newConfig.term || "First Term",
             academicYear: newConfig.academicYear || "2025-2026"
           }
@@ -241,16 +222,7 @@ export default function FeesPage() {
     setEditingConfig(null);
     setNewConfig({
       className: "",
-      tuitionFee: 0,
-      registrationFee: 0,
-      booksFee: 0,
-      uniformFee: 0,
-      labFee: 0,
-      sportsFee: 0,
-      technologyFee: 0,
-      transportFee: 0,
-      developmentFee: 0,
-      otherFees: 0,
+      fees: {},
       dueDate: "",
       term: "First Term",
       academicYear: "2025-2026"
@@ -261,6 +233,35 @@ export default function FeesPage() {
   const handleDeleteConfig = (id: string) => {
     if (confirm('Are you sure you want to delete this fee structure? This action cannot be undone.')) {
       setFeeConfigs(feeConfigs.filter(c => c.id !== id));
+    }
+  };
+
+  // Fee Type management handlers
+  const handleAddFeeType = () => {
+    if (!newFeeType.name.trim()) return;
+    const key = newFeeType.name.toLowerCase().replace(/\s+/g, '') + Date.now().toString();
+    const feeType: FeeType = {
+      id: Date.now().toString(),
+      name: newFeeType.name,
+      key,
+      defaultAmount: newFeeType.defaultAmount
+    };
+    setFeeTypes([...feeTypes, feeType]);
+    setNewFeeType({ name: "", defaultAmount: 0 });
+  };
+
+  const handleDeleteFeeType = (id: string) => {
+    if (confirm('Are you sure you want to delete this fee type? It will be removed from all fee structures.')) {
+      const feeTypeToDelete = feeTypes.find(ft => ft.id === id);
+      if (feeTypeToDelete) {
+        setFeeTypes(feeTypes.filter(ft => ft.id !== id));
+        // Also remove from existing configs
+        setFeeConfigs(feeConfigs.map(config => {
+          const newFees = { ...config.fees };
+          delete newFees[feeTypeToDelete.key];
+          return { ...config, fees: newFees };
+        }));
+      }
     }
   };
 
@@ -599,16 +600,7 @@ export default function FeesPage() {
               setEditingConfig(null);
               setNewConfig({
                 className: "",
-                tuitionFee: 0,
-                registrationFee: 0,
-                booksFee: 0,
-                uniformFee: 0,
-                labFee: 0,
-                sportsFee: 0,
-                technologyFee: 0,
-                transportFee: 0,
-                developmentFee: 0,
-                otherFees: 0,
+                fees: {},
                 dueDate: "",
                 term: "First Term",
                 academicYear: "2025-2026"
@@ -628,16 +620,9 @@ export default function FeesPage() {
             <thead>
               <tr>
                 <th>Class</th>
-                <th>Tuition</th>
-                <th>Registration</th>
-                <th>Books</th>
-                <th>Uniform</th>
-                <th>Lab</th>
-                <th>Sports</th>
-                <th>Technology</th>
-                <th>Transport</th>
-                <th>Development</th>
-                <th>Other</th>
+                {feeTypes.map(ft => (
+                  <th key={ft.id}>{ft.name.replace(' Fee', '')}</th>
+                ))}
                 <th>Total</th>
                 <th>Due Date</th>
                 <th>Actions</th>
@@ -645,20 +630,18 @@ export default function FeesPage() {
             </thead>
             <tbody>
               {feeConfigs.map((config) => {
-                const total = config.tuitionFee + config.registrationFee + config.booksFee + config.uniformFee + config.labFee + config.sportsFee + config.technologyFee + config.transportFee + config.developmentFee + config.otherFees;
+                const total = Object.values(config.fees).reduce((sum, val) => sum + (val || 0), 0);
                 return (
                   <tr key={config.id}>
                     <td className="text-white font-medium">{config.className}</td>
-                    <td className="text-blue-400">${config.tuitionFee.toLocaleString()}</td>
-                    <td>${config.registrationFee.toLocaleString()}</td>
-                    <td>${config.booksFee.toLocaleString()}</td>
-                    <td>${config.uniformFee.toLocaleString()}</td>
-                    <td className="text-purple-400">${config.labFee.toLocaleString()}</td>
-                    <td className="text-green-400">${config.sportsFee.toLocaleString()}</td>
-                    <td className="text-cyan-400">${config.technologyFee.toLocaleString()}</td>
-                    <td className="text-orange-400">${config.transportFee.toLocaleString()}</td>
-                    <td className="text-pink-400">${config.developmentFee.toLocaleString()}</td>
-                    <td>${config.otherFees.toLocaleString()}</td>
+                    {feeTypes.map((ft, index) => {
+                      const colors = ['text-blue-400', 'text-purple-400', 'text-green-400', 'text-cyan-400', 'text-orange-400', 'text-pink-400', 'text-yellow-400', 'text-red-400', 'text-indigo-400', 'text-teal-400'];
+                      return (
+                        <td key={ft.id} className={index < colors.length ? colors[index] : ''}>
+                          ${(config.fees[ft.key] || 0).toLocaleString()}
+                        </td>
+                      );
+                    })}
                     <td className="text-emerald-400 font-semibold">${total.toLocaleString()}</td>
                     <td className="text-slate-400">{config.dueDate}</td>
                     <td>
@@ -690,6 +673,41 @@ export default function FeesPage() {
               })}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Manage Fee Types Button */}
+      <div className="page-card">
+        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+          <div>
+            <h2 className="text-white font-semibold">Manage Fee Types</h2>
+            <p className="text-slate-500 text-xs mt-0.5">Add or remove fee categories from the fee structure</p>
+          </div>
+          <button 
+            className="btn-secondary text-sm"
+            onClick={() => setShowFeeTypesModal(true)}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Manage Fee Types
+          </button>
+        </div>
+        <div className="p-6">
+          <div className="flex flex-wrap gap-2">
+            {feeTypes.map((ft, index) => {
+              const colors = ['bg-blue-500/20 text-blue-400 border-blue-500/30', 'bg-purple-500/20 text-purple-400 border-purple-500/30', 'bg-green-500/20 text-green-400 border-green-500/30', 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30', 'bg-orange-500/20 text-orange-400 border-orange-500/30', 'bg-pink-500/20 text-pink-400 border-pink-500/30', 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', 'bg-red-500/20 text-red-400 border-red-500/30', 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30', 'bg-teal-500/20 text-teal-400 border-teal-500/30'];
+              return (
+                <span 
+                  key={ft.id} 
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border ${index < colors.length ? colors[index] : 'bg-slate-700 text-slate-400 border-slate-600'}`}
+                >
+                  {ft.name}
+                </span>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -1181,96 +1199,20 @@ export default function FeesPage() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Tuition Fee ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.tuitionFee}
-                    onChange={(e) => setNewConfig({ ...newConfig, tuitionFee: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Registration Fee ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.registrationFee}
-                    onChange={(e) => setNewConfig({ ...newConfig, registrationFee: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Books Fee ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.booksFee}
-                    onChange={(e) => setNewConfig({ ...newConfig, booksFee: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Uniform Fee ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.uniformFee}
-                    onChange={(e) => setNewConfig({ ...newConfig, uniformFee: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Lab Fee ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.labFee}
-                    onChange={(e) => setNewConfig({ ...newConfig, labFee: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Sports Fee ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.sportsFee}
-                    onChange={(e) => setNewConfig({ ...newConfig, sportsFee: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Technology Fee ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.technologyFee}
-                    onChange={(e) => setNewConfig({ ...newConfig, technologyFee: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Transport Fee ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.transportFee}
-                    onChange={(e) => setNewConfig({ ...newConfig, transportFee: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Development Fee ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.developmentFee}
-                    onChange={(e) => setNewConfig({ ...newConfig, developmentFee: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-sm mb-2">Other Fees ($)</label>
-                  <input
-                    type="number"
-                    value={newConfig.otherFees}
-                    onChange={(e) => setNewConfig({ ...newConfig, otherFees: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  />
-                </div>
+                {feeTypes.map((ft) => (
+                  <div key={ft.id}>
+                    <label className="block text-slate-400 text-sm mb-2">{ft.name} ($)</label>
+                    <input
+                      type="number"
+                      value={newConfig.fees[ft.key] || 0}
+                      onChange={(e) => setNewConfig({ 
+                        ...newConfig, 
+                        fees: { ...newConfig.fees, [ft.key]: parseFloat(e.target.value) || 0 } 
+                      })}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                ))}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -1324,6 +1266,97 @@ export default function FeesPage() {
                   Cancel
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Manage Fee Types Modal */}
+      {showFeeTypesModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-md overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
+              <h3 className="text-white font-semibold">Manage Fee Types</h3>
+              <button 
+                onClick={() => setShowFeeTypesModal(false)}
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              {/* Add new fee type */}
+              <div className="bg-slate-800 rounded-lg p-4">
+                <h4 className="text-white text-sm font-medium mb-3">Add New Fee Type</h4>
+                <div className="space-y-3">
+                  <div>
+                    <input
+                      type="text"
+                      value={newFeeType.name}
+                      onChange={(e) => setNewFeeType({ ...newFeeType, name: e.target.value })}
+                      className="w-full bg-slate-700 border border-slate-600 rounded-lg py-2 px-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm"
+                      placeholder="e.g., Library Fee"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      value={newFeeType.defaultAmount}
+                      onChange={(e) => setNewFeeType({ ...newFeeType, defaultAmount: parseFloat(e.target.value) || 0 })}
+                      className="flex-1 bg-slate-700 border border-slate-600 rounded-lg py-2 px-3 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm"
+                      placeholder="Default amount ($)"
+                    />
+                    <button
+                      onClick={handleAddFeeType}
+                      disabled={!newFeeType.name.trim()}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Existing fee types list */}
+              <div>
+                <h4 className="text-white text-sm font-medium mb-3">Current Fee Types</h4>
+                <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                  {feeTypes.map((ft, index) => {
+                    const colors = ['border-blue-500 bg-blue-500/10', 'border-purple-500 bg-purple-500/10', 'border-green-500 bg-green-500/10', 'border-cyan-500 bg-cyan-500/10', 'border-orange-500 bg-orange-500/10', 'border-pink-500 bg-pink-500/10', 'border-yellow-500 bg-yellow-500/10', 'border-red-500 bg-red-500/10', 'border-indigo-500 bg-indigo-500/10', 'border-teal-500 bg-teal-500/10'];
+                    return (
+                      <div 
+                        key={ft.id} 
+                        className={`flex items-center justify-between p-3 rounded-lg border ${index < colors.length ? colors[index] : 'border-slate-600 bg-slate-800'}`}
+                      >
+                        <div>
+                          <p className="text-white font-medium text-sm">{ft.name}</p>
+                          <p className="text-slate-400 text-xs">Default: ${ft.defaultAmount}</p>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteFeeType(ft.id)}
+                          className="text-slate-400 hover:text-red-400 transition-colors p-1"
+                          title="Delete fee type"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowFeeTypesModal(false)}
+                className="w-full btn-secondary justify-center"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>
