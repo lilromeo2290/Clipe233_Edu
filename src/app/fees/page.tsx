@@ -259,7 +259,9 @@ export default function FeesPage() {
   };
 
   const handleDeleteConfig = (id: string) => {
-    setFeeConfigs(feeConfigs.filter(c => c.id !== id));
+    if (confirm('Are you sure you want to delete this fee structure? This action cannot be undone.')) {
+      setFeeConfigs(feeConfigs.filter(c => c.id !== id));
+    }
   };
 
   // Combine all students from feeRecords and feedingRecords for search
