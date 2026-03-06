@@ -338,7 +338,7 @@ export default function FeesPage() {
 
   // Combine all students from feeRecords and feedingRecords for search
   const allStudents: (FeeRecord | FeedingRecord)[] = [...new Map([...feeRecords, ...feedingRecords].map(s => [s.studentId, s])).values()];
-  const filteredStudents = studentSearch.length > 0 
+  const filteredStudents: (FeeRecord | FeedingRecord)[] = studentSearch.length > 0 
     ? allStudents.filter(s => s.name.toLowerCase().includes(studentSearch.toLowerCase())) 
     : [];
 
@@ -503,6 +503,195 @@ export default function FeesPage() {
             <p className="text-slate-500 text-xs mt-0.5">Unpaid / Overdue</p>
           </div>
         </div>
+      </div>
+
+      {/* Quick Pay Section - Menu for Paying Fees */}
+      <div className="page-card px-6 py-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-white font-semibold flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+              Pay Fees
+            </h2>
+            <p className="text-slate-500 text-xs mt-0.5">Quickly record student fee payments</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500 text-xs">Payment Terminal</span>
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Student Search */}
+          <div className="relative">
+            <label className="text-slate-400 text-xs font-medium mb-1.5 block">Select Student</label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search student by name..."
+                className="search-input w-full pl-10"
+                value={studentSearch}
+                onChange={(e) => {
+                  setStudentSearch(e.target.value);
+                  setShowStudentDropdown(true);
+                }}
+                onFocus={() => setShowStudentDropdown(true)}
+                onBlur={() => setTimeout(() => setShowStudentDropdown(false), 200)}
+              />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
+            {showStudentDropdown && filteredStudents.length > 0 && (
+              <div className="absolute z-50 w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                {filteredStudents.slice(0, 8).map((s) => (
+                  <button
+                    key={s.studentId}
+                    className="w-full px-4 py-2.5 text-left hover:bg-slate-700 flex items-center justify-between transition-colors"
+                    onMouseDown={() => {
+                      setSelectedRecord(s);
+                      const rec = s as FeeRecord | FeedingRecord;
+                      const balance = 'balance' in rec ? (rec as FeeRecord).balance : (rec as FeedingRecord).amountDue - (rec as FeedingRecord).paid;
+                      setStudentSearch(s.name);
+                      setPaymentAmount(balance > 0 ? balance.toString() : "");
+                      setShowStudentDropdown(false);
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-slate-600 flex items-center justify-center text-xs font-semibold text-slate-300">
+                        {s.name.split(" ").map((n) => n[0]).join("")}
+                      </div>
+                      <div>
+                        <p className="text-white text-sm font-medium">{s.name}</p>
+                        <p className="text-slate-500 text-xs">{s.class}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-slate-500 font-mono">{s.studentId}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Amount Buttons */}
+          <div>
+            <label className="text-slate-400 text-xs font-medium mb-1.5 block">Quick Amount</label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  selectedRecord && parseFloat(paymentAmount || '0') > 0
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                    : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                }`}
+                onClick={() => {
+                  if (selectedRecord) {
+                    const rec = selectedRecord as FeeRecord | FeedingRecord;
+                    const balance = 'balance' in rec ? (rec as FeeRecord).balance : (rec as FeedingRecord).amountDue - (rec as FeedingRecord).paid;
+                    setPaymentAmount(balance > 0 ? balance.toString() : "0");
+                  }
+                }}
+              >
+                Full
+              </button>
+              <button
+                className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg text-sm font-medium transition-all"
+                onClick={() => setPaymentAmount("100")}
+              >
+                $100
+              </button>
+              <button
+                className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg text-sm font-medium transition-all"
+                onClick={() => setPaymentAmount("200")}
+              >
+                $200
+              </button>
+              <button
+                className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg text-sm font-medium transition-all"
+                onClick={() => setPaymentAmount("500")}
+              >
+                $500
+              </button>
+              <button
+                className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 py-2 rounded-lg text-sm font-medium transition-all col-span-2"
+                onClick={() => setPaymentAmount("1000")}
+              >
+                $1,000
+              </button>
+            </div>
+          </div>
+
+          {/* Payment Details & Action */}
+          <div className="flex flex-col gap-3">
+            <div className="flex-1">
+              <label className="text-slate-400 text-xs font-medium mb-1.5 block">Payment Amount ($)</label>
+              <input
+                type="number"
+                className="search-input w-full"
+                placeholder="Enter amount"
+                value={paymentAmount}
+                onChange={(e) => setPaymentAmount(e.target.value)}
+              />
+            </div>
+            <button
+              className={`btn-primary w-full justify-center ${
+                !selectedRecord ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={!selectedRecord}
+              onClick={() => {
+                if (selectedRecord && paymentAmount) {
+                  setShowPaymentModal(true);
+                }
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Process Payment
+            </button>
+          </div>
+        </div>
+
+        {/* Selected Student Info */}
+        {selectedRecord && (
+          <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-sm font-semibold text-white">
+                {selectedRecord.name.split(" ").map((n) => n[0]).join("")}
+              </div>
+              <div>
+                <p className="text-white font-medium">{selectedRecord.name}</p>
+                <p className="text-slate-500 text-xs">{selectedRecord.class} · {selectedRecord.studentId}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-6 text-right">
+              <div>
+                <p className="text-slate-500 text-xs">Total Due</p>
+                <p className="text-white font-semibold">
+                  ${('amount' in selectedRecord ? selectedRecord.amount : selectedRecord.amountDue).toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-slate-500 text-xs">Already Paid</p>
+                <p className="text-emerald-400 font-semibold">
+                  ${selectedRecord.paid.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-slate-500 text-xs">Balance</p>
+                <p className="text-red-400 font-semibold">
+                  ${(() => {
+                    const rec = selectedRecord as FeeRecord | FeedingRecord;
+                    return ('balance' in rec ? (rec as FeeRecord).balance : (rec as FeedingRecord).amountDue - (rec as FeedingRecord).paid).toLocaleString();
+                  })()}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
