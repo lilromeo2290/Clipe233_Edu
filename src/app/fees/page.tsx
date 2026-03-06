@@ -155,6 +155,10 @@ export default function FeesPage() {
   const [editingFeeType, setEditingFeeType] = useState<FeeType | null>(null);
   const [editFeeTypeValue, setEditFeeTypeValue] = useState({ name: "", defaultAmount: 0 });
   
+  // Inline editing state for fee amounts in the table
+  const [editingCell, setEditingCell] = useState<{ configId: string; feeKey: string } | null>(null);
+  const [cellEditValue, setCellEditValue] = useState("");
+  
   // Calculate outstanding balance based on payment amount
   const calculateOutstanding = (): number => {
     if (!selectedRecord) return 0;
@@ -303,6 +307,33 @@ export default function FeesPage() {
   const handleCancelFeeTypeEdit = () => {
     setEditingFeeType(null);
     setEditFeeTypeValue({ name: "", defaultAmount: 0 });
+  };
+
+  // Inline edit handlers for fee amounts in table
+  const handleStartCellEdit = (configId: string, feeKey: string, currentValue: number) => {
+    setEditingCell({ configId, feeKey });
+    setCellEditValue(currentValue.toString());
+  };
+
+  const handleSaveCellEdit = () => {
+    if (!editingCell) return;
+    const newValue = parseFloat(cellEditValue) || 0;
+    setFeeConfigs(feeConfigs.map(config => {
+      if (config.id === editingCell.configId) {
+        return {
+          ...config,
+          fees: { ...config.fees, [editingCell.feeKey]: newValue }
+        };
+      }
+      return config;
+    }));
+    setEditingCell(null);
+    setCellEditValue("");
+  };
+
+  const handleCancelCellEdit = () => {
+    setEditingCell(null);
+    setCellEditValue("");
   };
 
   // Combine all students from feeRecords and feedingRecords for search
@@ -672,13 +703,51 @@ export default function FeesPage() {
               {feeConfigs.map((config) => {
                 const total = Object.values(config.fees).reduce((sum, val) => sum + (val || 0), 0);
                 return (
-                  <tr key={config.id}>
+                  <tr key={config.id} className="group">
                     <td className="text-white font-medium">{config.className}</td>
                     {feeTypes.map((ft, index) => {
                       const colors = ['text-blue-400', 'text-purple-400', 'text-green-400', 'text-cyan-400', 'text-orange-400', 'text-pink-400', 'text-yellow-400', 'text-red-400', 'text-indigo-400', 'text-teal-400'];
+                      const isEditing = editingCell?.configId === config.id && editingCell?.feeKey === ft.key;
                       return (
                         <td key={ft.id} className={index < colors.length ? colors[index] : ''}>
-                          ${(config.fees[ft.key] || 0).toLocaleString()}
+                          {isEditing ? (
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                value={cellEditValue}
+                                onChange={(e) => setCellEditValue(e.target.value)}
+                                className="w-20 bg-slate-800 text-white text-sm px-2 py-1 rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
+                                autoFocus
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveCellEdit();
+                                  if (e.key === 'Escape') handleCancelCellEdit();
+                                }}
+                              />
+                              <button onClick={handleSaveCellEdit} className="text-green-400 hover:text-green-300 p-1">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                              </button>
+                              <button onClick={handleCancelCellEdit} className="text-red-400 hover:text-red-300 p-1">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                              </button>
+                            </div>
+                          ) : (
+                            <button 
+                              className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                              title="Click to edit"
+                              onClick={() => handleStartCellEdit(config.id, ft.key, config.fees[ft.key] || 0)}
+                            >
+                              ${(config.fees[ft.key] || 0).toLocaleString()}
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-0 group-hover:opacity-50">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                              </svg>
+                            </button>
+                          )}
                         </td>
                       );
                     })}
