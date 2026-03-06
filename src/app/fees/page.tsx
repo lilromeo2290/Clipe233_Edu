@@ -152,6 +152,8 @@ export default function FeesPage() {
     academicYear: "2025-2026"
   });
   const [newFeeType, setNewFeeType] = useState({ name: "", defaultAmount: 0 });
+  const [editingFeeType, setEditingFeeType] = useState<FeeType | null>(null);
+  const [editFeeTypeValue, setEditFeeTypeValue] = useState({ name: "", defaultAmount: 0 });
   
   // Calculate outstanding balance based on payment amount
   const calculateOutstanding = (): number => {
@@ -263,6 +265,44 @@ export default function FeesPage() {
         }));
       }
     }
+  };
+
+  const handleEditFeeTypeClick = (feeType: FeeType) => {
+    setEditingFeeType(feeType);
+    setEditFeeTypeValue({ name: feeType.name, defaultAmount: feeType.defaultAmount });
+  };
+
+  const handleSaveFeeTypeEdit = () => {
+    if (!editingFeeType || !editFeeTypeValue.name.trim()) return;
+    
+    const oldKey = editingFeeType.key;
+    const newKey = editFeeTypeValue.name.toLowerCase().replace(/\s+/g, '') + editingFeeType.id;
+    
+    setFeeTypes(feeTypes.map(ft => 
+      ft.id === editingFeeType.id 
+        ? { ...ft, name: editFeeTypeValue.name, key: newKey, defaultAmount: editFeeTypeValue.defaultAmount }
+        : ft
+    ));
+    
+    // Also update in existing configs if key changed
+    if (oldKey !== newKey) {
+      setFeeConfigs(feeConfigs.map(config => {
+        const newFees = { ...config.fees };
+        if (newFees[oldKey] !== undefined) {
+          newFees[newKey] = newFees[oldKey];
+          delete newFees[oldKey];
+        }
+        return { ...config, fees: newFees };
+      }));
+    }
+    
+    setEditingFeeType(null);
+    setEditFeeTypeValue({ name: "", defaultAmount: 0 });
+  };
+
+  const handleCancelFeeTypeEdit = () => {
+    setEditingFeeType(null);
+    setEditFeeTypeValue({ name: "", defaultAmount: 0 });
   };
 
   // Combine all students from feeRecords and feedingRecords for search
@@ -1326,25 +1366,78 @@ export default function FeesPage() {
                 <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
                   {feeTypes.map((ft, index) => {
                     const colors = ['border-blue-500 bg-blue-500/10', 'border-purple-500 bg-purple-500/10', 'border-green-500 bg-green-500/10', 'border-cyan-500 bg-cyan-500/10', 'border-orange-500 bg-orange-500/10', 'border-pink-500 bg-pink-500/10', 'border-yellow-500 bg-yellow-500/10', 'border-red-500 bg-red-500/10', 'border-indigo-500 bg-indigo-500/10', 'border-teal-500 bg-teal-500/10'];
+                    const isEditing = editingFeeType?.id === ft.id;
+                    
                     return (
                       <div 
                         key={ft.id} 
                         className={`flex items-center justify-between p-3 rounded-lg border ${index < colors.length ? colors[index] : 'border-slate-600 bg-slate-800'}`}
                       >
-                        <div>
-                          <p className="text-white font-medium text-sm">{ft.name}</p>
-                          <p className="text-slate-400 text-xs">Default: ${ft.defaultAmount}</p>
-                        </div>
-                        <button
-                          onClick={() => handleDeleteFeeType(ft.id)}
-                          className="text-slate-400 hover:text-red-400 transition-colors p-1"
-                          title="Delete fee type"
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          </svg>
-                        </button>
+                        {isEditing ? (
+                          <div className="flex-1 flex gap-2 items-center">
+                            <input
+                              type="text"
+                              value={editFeeTypeValue.name}
+                              onChange={(e) => setEditFeeTypeValue({ ...editFeeTypeValue, name: e.target.value })}
+                              className="flex-1 bg-slate-700 border border-slate-600 rounded-lg py-1.5 px-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                            />
+                            <input
+                              type="number"
+                              value={editFeeTypeValue.defaultAmount}
+                              onChange={(e) => setEditFeeTypeValue({ ...editFeeTypeValue, defaultAmount: parseFloat(e.target.value) || 0 })}
+                              className="w-24 bg-slate-700 border border-slate-600 rounded-lg py-1.5 px-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                            />
+                            <button
+                              onClick={handleSaveFeeTypeEdit}
+                              disabled={!editFeeTypeValue.name.trim()}
+                              className="p-1.5 text-green-400 hover:text-green-300 disabled:opacity-50"
+                              title="Save"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={handleCancelFeeTypeEdit}
+                              className="p-1.5 text-slate-400 hover:text-white"
+                              title="Cancel"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                              </svg>
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <div>
+                              <p className="text-white font-medium text-sm">{ft.name}</p>
+                              <p className="text-slate-400 text-xs">Default: ${ft.defaultAmount}</p>
+                            </div>
+                            <div className="flex gap-1">
+                              <button
+                                onClick={() => handleEditFeeTypeClick(ft)}
+                                className="text-slate-400 hover:text-blue-400 transition-colors p-1"
+                                title="Edit fee type"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteFeeType(ft.id)}
+                                className="text-slate-400 hover:text-red-400 transition-colors p-1"
+                                title="Delete fee type"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg>
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </div>
                     );
                   })}
