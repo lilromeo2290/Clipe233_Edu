@@ -38,6 +38,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Fixed modal scrolling issues (Record Payment, Add Class, Class Detail modals)
 - [x] Fixed Add Class modal scrolling structure (flex container with scrollable content area)
 - [x] Fee Structure made configurable with dynamic fee types (add/remove fee categories)
+- [x] Edit functionality added for fee types (edit name and default amount directly in Manage Fee Types modal)
 
 ## Current Structure
 
