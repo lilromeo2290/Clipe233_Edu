@@ -667,7 +667,7 @@ export default function FeedingPage() {
             <div className="p-6 space-y-4">
               {/* School Header */}
               <div className="text-center border-b border-slate-700 pb-4">
-                <h2 className="text-white font-bold text-lg">Clipe233 Edu School</h2>
+                <h2 className="text-white font-bold text-lg">Clipe233 Edu School Manager</h2>
                 <p className="text-slate-400 text-xs">123 Education Street, Accra, Ghana</p>
                 <p className="text-slate-400 text-xs">Daily Feeding Programme</p>
               </div>

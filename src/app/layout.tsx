@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clipe233 Edu – School Management System",
+  title: "Clipe233 Edu – School Manager System",
   description: "A comprehensive school management system for students, teachers, classes, attendance, and grades.",
 };
 

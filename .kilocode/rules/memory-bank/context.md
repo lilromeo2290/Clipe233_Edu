@@ -36,6 +36,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Class filter added to Fee Records table (filter by class)
 - [x] Fee Structure expanded with additional fee types (Lab Fee, Sports Fee, Technology Fee, Transport Fee, Development Fee)
 - [x] Branding changed from EduManage to Clipe233 Edu with custom logo
+- [x] Footer text changed from "School Management System" to "Clipe233 Edu School Manager"
 - [x] Fixed modal scrolling issues (Record Payment, Add Class, Class Detail modals)
 - [x] Fixed Add Class modal scrolling structure (flex container with scrollable content area)
 - [x] Fee Structure made configurable with dynamic fee types (add/remove fee categories)
@@ -64,7 +65,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 
 ## Current Focus
 
-School Management System is fully built. Features include:
+Clipe233 Edu School Manager is fully built. Features include:
 - Dashboard with KPI stats, recent students, upcoming events, top classes
 - Students module: table with GPA, status, search/filter
 - Teachers module: table with subjects, classes, ratings

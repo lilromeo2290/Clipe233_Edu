@@ -288,7 +288,7 @@ export default function TerminalReportsPage() {
           </tbody>
         </table>
         <div class="remarks"><h4>Teacher Remarks:</h4><p>${editableRemarks}</p></div>
-        <div class="footer"><p>Generated on ${report.generatedAt} | School Management System</p></div>
+        <div class="footer"><p>Generated on ${report.generatedAt} | Clipe233 Edu School Manager</p></div>
       </body>
       </html>
     `;
