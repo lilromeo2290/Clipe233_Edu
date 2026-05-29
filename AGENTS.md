@@ -1,4 +1,12 @@
-## Optional Feature Guides
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `bun install` | Install dependencies |
+| `bun build` | Build production app |
+| `bun lint` | Check code quality |
+| `bun typecheck` | Type checking |
+| `bun worklog` | Commit and push to GitHub |
 
 When users request features beyond the base template, check for available recipes in `.kilocode/recipes/`.
 
@@ -20,3 +28,7 @@ After completing the user's request, update the relevant memory bank files:
 
 - `.kilocode/rules/memory-bank/context.md` - Current state and recent changes
 - Other memory bank files as needed when architecture, tech stack, or project goals change
+
+## Worklog Command
+
+Use `/worklog` to commit and push changes to GitHub repository.
