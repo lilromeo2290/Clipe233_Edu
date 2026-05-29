@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const navItems = [
   {
@@ -162,18 +163,15 @@ export default function Sidebar() {
     >
       {/* Logo */}
       <div className="px-6 py-5 border-b border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-              <path d="M6 12v5c3 3 9 3 12 0v-5" />
-            </svg>
+<div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+              <Image src="https://assets.kiloapps.io/user_155c3b25-1523-47f6-9f02-87960067237c/be725000-a934-4c0e-a685-5d0e8d3bb652/d5b1ba38-fed7-414c-8cc0-36c30e5da967.jpg" alt="Clipe233 Edu Logo" className="w-full h-full object-cover" width={32} height={32} />
+            </div>
+            <div>
+              <p className="text-white font-semibold text-sm leading-tight">Clipe233 Edu</p>
+              <p className="text-slate-500 text-xs">School Management</p>
+            </div>
           </div>
-          <div>
-            <p className="text-white font-semibold text-sm leading-tight">EduManage</p>
-            <p className="text-slate-500 text-xs">School Management</p>
-          </div>
-        </div>
       </div>
 
       {/* Navigation */}
